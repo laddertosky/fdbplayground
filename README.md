@@ -2,8 +2,8 @@
 To be familiar with foundationDB
 
 # Targets
-:white_large_square Compiling foundationDB from source code.
-:white_large_square 
+:white_check_mark: Compiling foundationDB from source code.
+:white_check_mark: Initialize fdb cluster with built binary 
 
 # Steps
 ## preparation
@@ -19,7 +19,7 @@ sudo update-alternatives --set gcc /usr/bin/gcc-11
 
 ```
 
-1. Clone the foundationDB [source code](https://www.github.com/apple/foundationdb), checkout to the latest release, here I user 7.3.43.
+2. Clone the foundationDB [source code](https://www.github.com/apple/foundationdb), checkout to the latest release, here I user 7.3.43.
 ```
 cd /opt
 git clone https://www.github.com/apple/foundationdb
@@ -31,12 +31,12 @@ There is a commit about missing the third parameters for system call open in the
 This will break the compiling process, but I don't know why their CI system didn't complaint about this.
 https://github.com/apple/foundationdb/commit/c1ba5d5733bea67b3a6f4a6ff8246e4137cb3ba4#diff-0977e6820509adb180b6798786d671503de757a951e9b7725d0966589d8a6044R692
 
-1. Install cmake Version 3.13 or higher [CMake](https://cmake.org/)
+3. Install cmake Version 3.13 or higher [CMake](https://cmake.org/)
 ```
 sudo apt install -y cmake
 ```
 
-1. Install [Mono](https://www.mono-project.com/download/stable/)
+4. Install [Mono](https://www.mono-project.com/download/stable/)
 
 ```
 sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
@@ -46,12 +46,12 @@ sudo apt install -y mono-dev
 
 ```
 
-1. Install [Ninja](https://ninja-build.org/)
+5. Install [Ninja](https://ninja-build.org/)
 ```
 sudo apt install -y ninja
 ```
 
-1. Install missing packages from foundationDB instruction: [jemalloc](https://www.github.com/jemalloc/jemalloc), autoconf(Required to compile jemalloc from source code, more accurately, the autogen.sh script requires it.), liblz4-dev, python3-pip, python3-venv
+6. Install missing packages from foundationDB instruction: [jemalloc](https://www.github.com/jemalloc/jemalloc), autoconf(Required to compile jemalloc from source code, more accurately, the autogen.sh script requires it.), liblz4-dev, python3-pip, python3-venv
 
 Compiling and installng jemaloc with latest release, here I use 5.3.0:
 ```
@@ -76,21 +76,21 @@ sudo apt install -y \
     python3-venv
 ```
 
-1. Checkout into the foundationDB directory, create a blank build directory.
+7. Checkout into the foundationDB directory, create a blank build directory.
 ```
 cd <PATH_TO_FOUNDATIONDB_DIRECTORY>
 mkdir build
 
 ```
 
-1. Build with the following instruction, USE_WERROR is not set due to the waring messages from deprecated calls since OpenSSL 3.0:
+8. Build with the following instruction, USE_WERROR is not set due to the waring messages from deprecated calls since OpenSSL 3.0:
 ```
 cd build
 cmake -G Ninja ..
 ninja
 ```
 
-1. Try to run ctest, but the test_venv_setup tests using deprecated distutils, which removed from python3.10. My Ubuntu 24.04 uses python3.12, so I decided to skip it for now.
+9. Try to run ctest, but the test_venv_setup tests using deprecated distutils, which removed from python3.10. My Ubuntu 24.04 uses python3.12, so I decided to skip it for now.
 (It's also required to install libffi-dev for this test)
 
 Edit:
