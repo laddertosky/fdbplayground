@@ -78,7 +78,7 @@ sudo apt install -y \
 
 1. Checkout into the foundationDB directory, create a blank build directory.
 ```
-cd <PATH_TO_FOUNDATIONDB_DIRECTORY>`
+cd <PATH_TO_FOUNDATIONDB_DIRECTORY>
 mkdir build
 
 ```
@@ -89,3 +89,11 @@ cd build
 cmake -G Ninja ..
 ninja
 ```
+
+1. Try to run ctest, but the test_venv_setup tests using deprecated distutils, which removed from python3.10. My Ubuntu 24.04 uses python3.12, so I decided to skip it for now.
+(It's also required to install libffi-dev for this test)
+
+Edit:
+Even if I install python3.8 and distutils, the test (test_venv_setup) still failed.
+It failed at `python3 setup.py install`, which is also deprecated.
+
