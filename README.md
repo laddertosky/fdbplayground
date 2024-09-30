@@ -97,3 +97,33 @@ Edit:
 Even if I install python3.8 and distutils, the test (test_venv_setup) still failed.
 It failed at `python3 setup.py install`, which is also deprecated.
 
+## Initialization
+1. Use the built binary (fdbmonitor, fdbcli), cluster file, configuration file to setup new database in the cluster
+```
+# The server side
+
+cd <PATH_TO_FOUNDATIONDB_DIRECTORY>/build
+./bin/fdbmonitor --conffile ./sandbox/foundationdb.conf --lockfile /tmp/fdbmonitor.pid
+
+```
+
+```
+# The client side
+
+cd <PATH_TO_FOUNDATIONDB_DIRECTORY>/build
+./bin/fdbcli -C ./fdb.cluster
+
+```
+2. For the first time, fdbcli will throw a confusing error message: 'The database is unavailable.' Even though the log message says the connection is refused, it do connects to the cluster. The real problem is that there is no database initialized in this cluster. So we should create one inside the fdbcli.
+
+```
+fdb> configure new single ssd
+
+```
+3. Then we could type status in fdbcli to check the database status. If we exit the fdbcli and reentry, the welcome message will includ 'The database is available.'.
+
+```
+fdb> status
+
+```
+
