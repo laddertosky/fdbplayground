@@ -114,7 +114,7 @@ cd <PATH_TO_FOUNDATIONDB_DIRECTORY>/build
 ./bin/fdbcli -C ./fdb.cluster
 
 ```
-2. For the first time, fdbcli will throw a confusing error message: 'The database is unavailable.' Even though the log message says the connection is refused, it do connects to the cluster. The real problem is that there is no database initialized in this cluster. So we should create one inside the fdbcli.
+2. For the first time, fdbcli will throw a confusing error message: 'The database is unavailable.' Even though the log message says the connection was refused, it did connect to the cluster. The real problem is that there is no database initialized in this cluster. So we should create one inside the fdbcli.
 
 ```
 fdb> configure new single ssd
