@@ -4,6 +4,12 @@ To be familiar with foundationDB
 # Targets
 - :white_check_mark: Compiling foundationDB from source code.
 - :white_check_mark: Initialize fdb cluster with built binary. 
+- :white_large_square: Issue KV operations (get, set, getrange, delete) with fdbcli.
+- :white_large_square: Use (C API)[https://apple.github.io/foundationdb/api-c.html] to issue KV operations (get, set, getrange, delete).
+- :white_large_square: Measure single getrange performance.
+- :white_large_square: Compare single vs multiple (parallel) getrange performance.
+- :white_large_square: Understand (read snapshot)[https://apple.github.io/foundationdb/api-c.html#snapshot-reads].
+- :white_large_square: Understand (transaction conflict)[https://apple.github.io/foundationdb/developer-guide.html#conflict-ranges].
 
 # Steps
 ## preparation
@@ -28,7 +34,7 @@ git checkout 7.3.43
 ```
 ### manual fix
 There is a commit about missing the third parameters for system call open in the main branch, but not merged/cherry-picked in the release.
-This will break the compiling process, but I don't know why their CI system didn't complaint about this.
+This will break the compiling process, but I don't know why their CI system didn't complain about this.
 https://github.com/apple/foundationdb/commit/c1ba5d5733bea67b3a6f4a6ff8246e4137cb3ba4#diff-0977e6820509adb180b6798786d671503de757a951e9b7725d0966589d8a6044R692
 
 3. Install cmake Version 3.13 or higher [CMake](https://cmake.org/)
@@ -120,6 +126,8 @@ cd <PATH_TO_FOUNDATIONDB_DIRECTORY>/build
 fdb> configure new single ssd
 
 ```
+Note that there is no corresponding log shown in the fdbmonitor, which is also confusing.
+
 3. Then we could type status in fdbcli to check the database status. If we exit the fdbcli and reentry, the welcome message will includ 'The database is available.'.
 
 ```
