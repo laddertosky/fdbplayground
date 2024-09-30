@@ -2,8 +2,8 @@
 To be familiar with foundationDB
 
 # Targets
-:white_check_mark: Compiling foundationDB from source code.
-:white_check_mark: Initialize fdb cluster with built binary 
+- :white_check_mark: Compiling foundationDB from source code.
+- :white_check_mark: Initialize fdb cluster with built binary. 
 
 # Steps
 ## preparation
