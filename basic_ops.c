@@ -1,3 +1,4 @@
+#include <foundationdb/fdb_c_types.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
@@ -59,6 +60,22 @@ void teardown(pthread_t* network_thread) {
     printf("Network thread stopped.\n");
 }
 
+void test_get(FDBDatabase* db) {
+
+}
+
+void test_set(FDBDatabase* db) {
+
+}
+
+void test_getrange(FDBDatabase* db) {
+
+}
+
+void test_delete(FDBDatabase* db) {
+
+}
+
 int main(int argc, char** argv) {
     pthread_t network_thread;
     char* cluster_file_path = NULL;
@@ -70,5 +87,10 @@ int main(int argc, char** argv) {
     }
 
     FDBDatabase* db = setup(cluster_file_path, &network_thread);
+    test_get(db);
+    test_set(db);
+    test_getrange(db);
+    test_delete(db);
+
     teardown(&network_thread);
 }
