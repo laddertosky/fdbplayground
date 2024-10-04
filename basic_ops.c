@@ -51,20 +51,66 @@ void teardown(pthread_t* network_thread) {
     printf("Network thread stopped.\n");
 }
 
-void test_get(FDBDatabase* db) {
+void run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), const char* task_description) {
+    FDBTransaction* tr = NULL;
+    exit_when_err(fdb_database_create_transaction(db, &tr), "fdb_database_create_transaction");
 
+    fdb_error_t err = run_impl(tr);
+    if (!err) {
+        FDBFuture* future = fdb_transaction_commit(tr);
+        err = fdb_future_block_until_ready(future);
+        fdb_future_destroy(future);
+    }
+
+    // Error might come from commiting process, so don't merge with the above branch.
+    if (err) {
+        printf("[ERROR] Something wrong in transaction: %s, to rollback... Descrition: %s", task_description, fdb_get_error(err));
+
+        FDBFuture* future = fdb_transaction_on_error(tr, err);
+
+        fdb_error_t block_err = fdb_future_block_until_ready(future);
+        if (block_err) {
+            printf("[ERROR] During rolling back for transaction: %s. From blocking operation, description: %s", task_description, fdb_get_error(block_err));
+        } else {
+            fdb_error_t future_err = fdb_future_get_error(future);
+            printf("[ERROR] During rolling back for transaction: %s. From future operation, Description: %s", task_description, fdb_get_error(future_err));
+        }
+        fdb_future_destroy(future);
+    }
+
+    fdb_transaction_destroy(tr);
+}
+
+fdb_error_t get_impl(FDBTransaction* tr) {
+    return NULL;
+}
+
+fdb_error_t set_impl(FDBTransaction* tr) {
+    return NULL;
+}
+
+fdb_error_t getrange_impl(FDBTransaction* tr) {
+    return NULL;
+}
+
+fdb_error_t delete_impl(FDBTransaction* tr) {
+    return NULL;
+}
+
+void test_get(FDBDatabase* db) {
+    run_transaction(db, get_impl, "get");
 }
 
 void test_set(FDBDatabase* db) {
-
+    run_transaction(db, set_impl, "set");
 }
 
 void test_getrange(FDBDatabase* db) {
-
+    run_transaction(db, getrange_impl, "getrange");
 }
 
 void test_delete(FDBDatabase* db) {
-
+    run_transaction(db, delete_impl, "delete");
 }
 
 int main(int argc, char** argv) {
