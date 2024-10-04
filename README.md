@@ -4,7 +4,7 @@ To be familiar with foundationDB
 # Targets
 - :white_check_mark: Compiling foundationDB from source code.
 - :white_check_mark: Initialize fdb cluster with built binary. 
-- :white_large_square: Issue KV operations (get, set, getrange, delete) with fdbcli.
+- :white_check_mark: Issue KV operations (get, set, getrange, delete) with fdbcli.
 - :white_large_square: Use [C API](https://apple.github.io/foundationdb/api-c.html) to issue KV operations (get, set, getrange, delete).
 - :white_large_square: Measure single getrange performance.
 - :white_large_square: Compare single vs multiple (parallel) getrange performance.
@@ -134,4 +134,11 @@ Note that there is no corresponding log shown in the fdbmonitor, which is also c
 fdb> status
 
 ```
+## Development setup
+1. Because I build this repository from source code, I need to install those headers (.h) and shared libraries (.so) before my development. The default path for installation is /usr/local
 
+```
+cd <PATH_TO_FOUNDATIONDB_DIRECTORY>/build
+sudo cmake --install ./bindings/c/
+
+```
