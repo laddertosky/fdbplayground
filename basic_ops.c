@@ -10,7 +10,7 @@
 void exit_when_err(fdb_error_t err, const char* method) {
     if (!err) return;
 
-    printf("[ERROR] During %s. Description: %s\n", method, fdb_get_error(err));
+    printf("[FATAL] During %s. Description: %s\n", method, fdb_get_error(err));
     exit(1);
 }
 
@@ -28,7 +28,7 @@ FDBDatabase* setup(const char* cluster_file_path, pthread_t* network_thread) {
 
     int err_pthread = pthread_create(network_thread, NULL, (void*) &run_network, NULL);
     if (err_pthread) {
-        printf("[ERROR] During creating network thread. Description: %s\n", strerror(err_pthread));
+        printf("[FATAL] During creating network thread. Description: %s\n", strerror(err_pthread));
         exit(2);
     }
 
@@ -45,7 +45,8 @@ void teardown(pthread_t* network_thread) {
 
     int err_pthread = pthread_join(*network_thread, NULL);
     if (err_pthread) {
-        printf("[ERROR] During joining the network thread. err: %s\n", strerror(err_pthread));
+        printf("[FATAL] During joining the network thread. err: %s\n", strerror(err_pthread));
+        exit(2);
     }
     printf("Network thread stopped.\n");
 }
