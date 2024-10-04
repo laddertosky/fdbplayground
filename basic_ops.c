@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <foundationdb/fdb_c_types.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,52 +7,41 @@
 #define FDB_API_VERSION 730
 #include <foundationdb/fdb_c.h>
 
+void exit_when_err(fdb_error_t err, const char* method) {
+    if (!err) return;
+
+    printf("[ERROR] During %s. Description: %s\n", method, fdb_get_error(err));
+    exit(1);
+}
+
 // Start routine to run the network in auxiliary thread.
 void* run_network() {
-    fdb_error_t err = fdb_run_network();
-    if (err) {
-        printf("[ERROR] During running network. err: %s\n", fdb_get_error(err));
-    }
+    exit_when_err(fdb_run_network(), "fdb_run_network");
     return NULL;
 }
 
 FDBDatabase* setup(const char* cluster_file_path, pthread_t* network_thread) {
-    fdb_error_t err = fdb_select_api_version(FDB_API_VERSION);
-    if (err) {
-        printf("[ERROR] During select API version. err: %s\n", fdb_get_error(err));
-        return NULL;
-    }
+    exit_when_err(fdb_select_api_version(FDB_API_VERSION), "fdb_select_api_version");
 
     printf("This program uses client version: %s\n\n", fdb_get_client_version());
-    err = fdb_setup_network();
-    if (err) {
-        printf("[ERROR] During seting up network. err: %s\n", fdb_get_error(err));
-        return NULL;
-    }
+    exit_when_err(fdb_setup_network(), "fdb_setup_network");
 
     int err_pthread = pthread_create(network_thread, NULL, (void*) &run_network, NULL);
     if (err_pthread) {
-        printf("[ERROR] During creating network thread. err: %s\n", strerror(err_pthread));
-        return NULL;
+        printf("[ERROR] During creating network thread. Description: %s\n", strerror(err_pthread));
+        exit(2);
     }
 
     printf("Network thread started.\n");
     FDBDatabase* db;
-    err = fdb_create_database(cluster_file_path, &db);
-    if (err) {
-        printf("[ERROR] During creating database. err: %s\n", fdb_get_error(err));
-        return NULL;
-    }
+    exit_when_err(fdb_create_database(cluster_file_path, &db), "fdb_create_database");
 
     printf("Database create successfully.\n");
     return db;
 }
 
 void teardown(pthread_t* network_thread) {
-    fdb_error_t err = fdb_stop_network();
-    if (err) {
-        printf("[ERROR] During stopping database. err: %s\n", fdb_get_error(err));
-    }
+    exit_when_err(fdb_stop_network(), "fdb_stop_network");
 
     int err_pthread = pthread_join(*network_thread, NULL);
     if (err_pthread) {
