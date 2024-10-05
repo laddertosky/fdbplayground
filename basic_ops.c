@@ -285,7 +285,27 @@ fdb_error_t getrange_impl(FDBTransaction* tr) {
 }
 
 fdb_error_t delete_impl(FDBTransaction* tr) {
-    return NULL;
+    fdb_error_t err = set_default_transaction_option(tr);
+    if (err)
+        return err;
+
+    for (int i = 0; i < KEY_COUNT; i++) {
+        fdb_transaction_clear(tr, keys[i], KEY_SIZE);
+    }
+    return 0;
+}
+
+fdb_error_t delete_range_impl(FDBTransaction* tr) {
+    fdb_error_t err = set_default_transaction_option(tr);
+    if (err)
+        return err;
+
+    uint8_t begin_key[2] = "\x00";
+
+    // the server will not accept end_key with \xff, even with 0 end_or_equal, is that a bug?
+    uint8_t end_key[2] = "\xfe";
+    fdb_transaction_clear_range(tr, begin_key, 2, end_key, 2);
+    return 0;
 }
 
 void test_get(FDBDatabase* db) {
@@ -305,6 +325,11 @@ void test_delete(FDBDatabase* db) {
     run_transaction(db, delete_impl, "delete");
 }
 
+void test_delete_range(FDBDatabase* db) {
+    run_transaction(db, set_impl, "set_for_delete");
+    run_transaction(db, delete_range_impl, "delete_range");
+}
+
 int main(int argc, char** argv) {
     pthread_t network_thread;
     char* cluster_file_path = NULL;
@@ -322,6 +347,7 @@ int main(int argc, char** argv) {
     test_get(db);
     test_getrange(db);
     test_delete(db);
+    test_delete_range(db);
 
     destroy_key_value();
     teardown(&network_thread);
