@@ -5,7 +5,7 @@ To be familiar with foundationDB
 - :white_check_mark: Compiling foundationDB from source code.
 - :white_check_mark: Initialize fdb cluster with built binary. 
 - :white_check_mark: Issue KV operations (get, set, getrange, delete) with fdbcli.
-- :white_large_square: Use [C API](https://apple.github.io/foundationdb/api-c.html) to issue KV operations (get, set, getrange, delete).
+- :white_check_mark: Use [C API](https://apple.github.io/foundationdb/api-c.html) to issue KV operations (get, set, getrange, delete).
 - :white_large_square: Measure single getrange performance.
 - :white_large_square: Compare single vs multiple (parallel) getrange performance.
 - :white_large_square: Understand [read snapshot](https://apple.github.io/foundationdb/api-c.html#snapshot-reads).
@@ -142,3 +142,8 @@ cd <PATH_TO_FOUNDATIONDB_DIRECTORY>/build
 sudo cmake --install ./bindings/c/
 
 ```
+
+## Development note
+1. In getrange, the if we want to obtain the whole user key ranges [\x00, \xff), even though using \xff with 0 end_or_equal, fdb will throw "Key outside legal range.
+
+
