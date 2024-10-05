@@ -128,14 +128,14 @@ void check_obtained_value(FDBFuture* future, void* index_ptr) {
     int value_size;
     fdb_error_t err = fdb_future_get_value(future, &presented, &obtained, &value_size);
 
-    if (presented == 0) {
+    if (err) {
+        printf("[WARN] Could not get value for key: %s. Description: %s\n", keys[index], fdb_get_error(err));   
+    } else if (presented == 0) {
         printf("[WARN] Could not get value for key: %s\n", keys[index]);
     } else if (value_size != VALUE_SIZE) {
         printf("[WARN] Obtained different value size from default, key: %s, obtained_value: %s, expected_value: %s\n", keys[index], obtained, values[index]);
     } else if (memcmp(obtained, values[index], VALUE_SIZE) != 0) {
         printf("[WARN] Obtained different value, key: %s, obtained_value: %s, expected_value: %s\n", keys[index], obtained, values[index]);
-    } else {
-        printf("[DEBUG] obtain value for key: %s successfully, value: %s\n", keys[index], values[index]);
     }
 }
 
@@ -179,7 +179,7 @@ fdb_error_t async_get_impl(FDBTransaction* tr) {
         fdb_future_destroy(futures[i]);
     }
 
-    return NULL;
+    return 0;
 }
 
 const int SYNC_GET_COUNT = 10;
@@ -212,7 +212,7 @@ fdb_error_t sync_get_impl(FDBTransaction* tr) {
         fdb_future_destroy(future);
     }
 
-    return NULL;
+    return 0;
 }
 
 fdb_error_t set_impl(FDBTransaction* tr) {
@@ -223,11 +223,65 @@ fdb_error_t set_impl(FDBTransaction* tr) {
     for (int i = 0; i < KEY_COUNT; i++) {
         fdb_transaction_set(tr, keys[i], KEY_SIZE, values[i], VALUE_SIZE);
     }
-    return NULL;
+    return 0;
 }
 
 fdb_error_t getrange_impl(FDBTransaction* tr) {
-    return NULL;
+    fdb_error_t err = set_default_transaction_option(tr);
+    if (err)
+        return err;
+
+
+    uint8_t begin_key[2] = "\x00";
+
+    // the server will not accept end_key with \xff, even with 0 end_or_equal, is that a bug?
+    uint8_t end_key[2] = "\xfe";
+    int limit = 0;
+
+    FDBFuture* future = fdb_transaction_get_range(tr, begin_key, 
+                                                  2 /* begin_key_name_length */, 
+                                                  0 /* begin_or_equal */,
+                                                  0 /* begin_offset */,
+                                                  end_key, 
+                                                  2 /* end_key_name_length */, 
+                                                  0 /* end_or_equal */, 
+                                                  1 /* end_offset */, 
+                                                  limit, 
+                                                  0 /* target_bytes */, 
+                                                  FDB_STREAMING_MODE_WANT_ALL, 
+                                                  0 /* iteration */, 
+                                                  0 /* snapshot */, 
+                                                  0 /* reverse */);
+
+    fdb_error_t block_err = fdb_future_block_until_ready(future);
+
+    if (block_err) {
+        printf("[ERROR] During getrange. From blocking operation, description: %s\n", fdb_get_error(block_err));
+        fdb_future_destroy(future);
+        return block_err;
+    } else {
+        fdb_error_t future_err = fdb_future_get_error(future);
+
+        if (future_err && !fdb_error_predicate(FDB_ERROR_PREDICATE_RETRYABLE, future_err))  {
+            printf("[ERROR] During getrange. From future operation, description: %s\n", fdb_get_error(future_err));
+            fdb_future_destroy(future);
+            return future_err;
+        }
+    }
+
+    const FDBKeyValue* outputs;
+    fdb_bool_t more;
+    int count;
+    err = fdb_future_get_keyvalue_array(future, &outputs, &count, &more);
+    printf("[INFO] Get %d kv pairs within %s - %s, more: %d\n", count, begin_key, end_key, more);
+
+    if (count != KEY_COUNT) {
+        printf("[WARN] Obtained key count does not match, expected %d, but got %d\n", KEY_COUNT, count);
+    }
+
+    fdb_future_destroy(future);
+
+    return 0;
 }
 
 fdb_error_t delete_impl(FDBTransaction* tr) {
