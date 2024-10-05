@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <time.h>
 #include <foundationdb/fdb_c_types.h>
 #include <stdio.h>
 #include <string.h>
@@ -118,7 +119,99 @@ void run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), 
     fdb_transaction_destroy(tr);
 }
 
-fdb_error_t get_impl(FDBTransaction* tr) {
+// FDBCallback
+void check_obtained_value(FDBFuture* future, void* index_ptr) {
+    int index = *(int*) index_ptr;
+
+    const uint8_t* obtained;
+    fdb_bool_t presented;
+    int value_size;
+    fdb_error_t err = fdb_future_get_value(future, &presented, &obtained, &value_size);
+
+    if (presented == 0) {
+        printf("[WARN] Could not get value for key: %s\n", keys[index]);
+    } else if (value_size != VALUE_SIZE) {
+        printf("[WARN] Obtained different value size from default, key: %s, obtained_value: %s, expected_value: %s\n", keys[index], obtained, values[index]);
+    } else if (memcmp(obtained, values[index], VALUE_SIZE) != 0) {
+        printf("[WARN] Obtained different value, key: %s, obtained_value: %s, expected_value: %s\n", keys[index], obtained, values[index]);
+    } else {
+        printf("[DEBUG] obtain value for key: %s successfully, value: %s\n", keys[index], values[index]);
+    }
+}
+
+#define ASYNC_GET_COUNT 10
+fdb_error_t async_get_impl(FDBTransaction* tr) {
+    fdb_error_t err = set_default_transaction_option(tr);
+    if (err)
+        return err;
+
+    FDBFuture* futures[ASYNC_GET_COUNT];
+    int indices[ASYNC_GET_COUNT];
+
+    for (int i = 0; i < ASYNC_GET_COUNT; i++) {
+        int index = rand() % KEY_COUNT; 
+        indices[i] = index;
+        uint8_t* key = keys[index];
+        futures[i] = fdb_transaction_get(tr, key, KEY_SIZE, 0);
+        err = fdb_future_set_callback(futures[i], &check_obtained_value, &indices[i]);
+    }
+
+    int completed_count = 0;
+    int completed[ASYNC_GET_COUNT] = {0};
+
+    struct timespec to_wait;
+    to_wait.tv_sec = 0;
+    to_wait.tv_nsec = 10000;
+    struct timespec remains;
+
+    while (completed_count < ASYNC_GET_COUNT) {
+        for (int i = 0; i < ASYNC_GET_COUNT; i++) {
+            if (completed[i] == 0 && fdb_future_is_ready(futures[i])) {
+                completed[i] = 1;
+                completed_count++;
+            }
+        }
+
+        nanosleep(&to_wait, &remains);
+    }
+
+    for (int i = 0; i < ASYNC_GET_COUNT; i++) {
+        fdb_future_destroy(futures[i]);
+    }
+
+    return NULL;
+}
+
+const int SYNC_GET_COUNT = 10;
+fdb_error_t sync_get_impl(FDBTransaction* tr) {
+    fdb_error_t err = set_default_transaction_option(tr);
+    if (err)
+        return err;
+
+    for (int i = 0; i < SYNC_GET_COUNT; i++) {
+        int index = rand() % KEY_COUNT; 
+        uint8_t* key = keys[index];
+        FDBFuture* future = fdb_transaction_get(tr, key, KEY_SIZE, 0);
+        fdb_error_t block_err = fdb_future_block_until_ready(future);
+
+        if (block_err) {
+            printf("[ERROR] During get: %s. From blocking operation, description: %s\n", key, fdb_get_error(block_err));
+            fdb_future_destroy(future);
+            return block_err;
+        } else {
+            fdb_error_t future_err = fdb_future_get_error(future);
+
+            if (future_err && !fdb_error_predicate(FDB_ERROR_PREDICATE_RETRYABLE, future_err))  {
+                printf("[ERROR] During get: %s. From future operation, Description: %s\n", key, fdb_get_error(future_err));
+                fdb_future_destroy(future);
+                return future_err;
+            }
+        }
+
+        check_obtained_value(future, &index);
+        fdb_future_destroy(future);
+    }
+
     return NULL;
 }
 
@@ -142,7 +235,8 @@ fdb_error_t delete_impl(FDBTransaction* tr) {
 }
 
 void test_get(FDBDatabase* db) {
-    run_transaction(db, get_impl, "get");
+    run_transaction(db, sync_get_impl, "sync get");
+    run_transaction(db, async_get_impl, "async get");
 }
 
 void test_set(FDBDatabase* db) {
