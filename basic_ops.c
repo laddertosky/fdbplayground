@@ -123,6 +123,13 @@ fdb_error_t get_impl(FDBTransaction* tr) {
 }
 
 fdb_error_t set_impl(FDBTransaction* tr) {
+    fdb_error_t err = set_default_transaction_option(tr);
+    if (err)
+        return err;
+
+    for (int i = 0; i < KEY_COUNT; i++) {
+        fdb_transaction_set(tr, keys[i], KEY_SIZE, values[i], VALUE_SIZE);
+    }
     return NULL;
 }
 
