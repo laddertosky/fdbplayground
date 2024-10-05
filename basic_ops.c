@@ -7,6 +7,37 @@
 #define FDB_API_VERSION 730
 #include <foundationdb/fdb_c.h>
 
+#define KEY_COUNT 100
+
+const int KEY_SIZE = 8;
+const int KEY_PREFIX_SIZE = 4;
+const char* KEY_FORMAT = "key_%0*d";
+const int VALUE_SIZE = 128;
+const int VALUE_PREFIX_SIZE = 6;
+const char* VALUE_FORMAT = "value_%0*d";
+
+uint8_t* keys[KEY_COUNT];
+uint8_t* values[KEY_COUNT];
+
+void prepare_key_value() {
+    for (int i = 0; i < KEY_COUNT; i++) {
+        uint8_t* key = (uint8_t*) malloc(sizeof(uint8_t) * KEY_SIZE);
+        sprintf((char*) key, KEY_FORMAT, KEY_SIZE-KEY_PREFIX_SIZE, i);
+        keys[i] = key;
+
+        uint8_t* value = (uint8_t*) malloc(sizeof(uint8_t) * VALUE_SIZE);
+        sprintf((char*) value, VALUE_FORMAT, VALUE_SIZE-VALUE_PREFIX_SIZE, i);
+        values[i] = value;
+    }
+}
+
+void destroy_key_value() {
+    for (int i = 0; i < KEY_COUNT; i++) {
+        free(keys[i]);
+        free(values[i]);
+    }
+}
+
 void exit_when_err(fdb_error_t err, const char* method) {
     if (!err) return;
 
@@ -65,20 +96,21 @@ void run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), 
         FDBFuture* future = fdb_transaction_commit(tr);
         err = fdb_future_block_until_ready(future);
         fdb_future_destroy(future);
+        printf("[INFO] transaction: %s committed\n", task_description);
     }
 
     // Error might come from commiting process, so don't merge with the above branch.
     if (err) {
-        printf("[ERROR] Something wrong in transaction: %s, to rollback... Descrition: %s", task_description, fdb_get_error(err));
+        printf("[ERROR] Something wrong in transaction: %s, to rollback... Descrition: %s\n", task_description, fdb_get_error(err));
 
         FDBFuture* future = fdb_transaction_on_error(tr, err);
 
         fdb_error_t block_err = fdb_future_block_until_ready(future);
         if (block_err) {
-            printf("[ERROR] During rolling back for transaction: %s. From blocking operation, description: %s", task_description, fdb_get_error(block_err));
+            printf("[ERROR] During rolling back for transaction: %s. From blocking operation, description: %s\n", task_description, fdb_get_error(block_err));
         } else {
             fdb_error_t future_err = fdb_future_get_error(future);
-            printf("[ERROR] During rolling back for transaction: %s. From future operation, Description: %s", task_description, fdb_get_error(future_err));
+            printf("[ERROR] During rolling back for transaction: %s. From future operation, Description: %s\n", task_description, fdb_get_error(future_err));
         }
         fdb_future_destroy(future);
     }
@@ -129,10 +161,13 @@ int main(int argc, char** argv) {
     }
 
     FDBDatabase* db = setup(cluster_file_path, &network_thread);
-    test_get(db);
+
+    prepare_key_value();
     test_set(db);
+    test_get(db);
     test_getrange(db);
     test_delete(db);
 
+    destroy_key_value();
     teardown(&network_thread);
 }
