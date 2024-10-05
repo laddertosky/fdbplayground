@@ -51,6 +51,11 @@ void teardown(pthread_t* network_thread) {
     printf("Network thread stopped.\n");
 }
 
+uint8_t retry_limit = 5;
+fdb_error_t set_default_transaction_option(FDBTransaction* tr) {
+    return fdb_transaction_set_option(tr, FDB_TR_OPTION_RETRY_LIMIT, (const uint8_t*)&retry_limit, sizeof(uint64_t));
+}
+
 void run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), const char* task_description) {
     FDBTransaction* tr = NULL;
     exit_when_err(fdb_database_create_transaction(db, &tr), "fdb_database_create_transaction");
