@@ -1,5 +1,4 @@
 #include "common.h"
-#include <stdint.h>
 
 #define KEY_COUNT 10000
 #define KEY_SIZE 12
@@ -8,7 +7,7 @@
 uint8_t** keys = NULL;
 uint8_t** values = NULL;
 
-fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
+fdb_error_t get_range_impl(FDBTransaction* tr, FDBStreamingMode mode, const char* operation) {
     fdb_error_t err = set_default_transaction_option(tr);
     if (err)
         return err;
@@ -18,6 +17,12 @@ fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
     // the server will not accept end_key with \xff, even with 0 end_or_equal, is that a bug?
     uint8_t end_key[2] = "\xfe";
 
+    // will be ignored when mode is not FDB_STREAMING_MODE_ITERATOR
+    int iteration = 0;
+
+    // exact mode requires limit parameters
+    int limit = KEY_COUNT;
+
     FDBFuture* future = fdb_transaction_get_range(tr, begin_key, 
                                                   2 /* begin_key_name_length */, 
                                                   0 /* begin_or_equal */,
@@ -26,10 +31,10 @@ fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
                                                   2 /* end_key_name_length */, 
                                                   0 /* end_or_equal */, 
                                                   1 /* end_offset */, 
-                                                  0 /* limit */, 
+                                                  limit /* limit */, 
                                                   0 /* target_bytes */, 
-                                                  FDB_STREAMING_MODE_WANT_ALL, 
-                                                  0 /* iteration */, 
+                                                  mode /* mode */, 
+                                                  ++iteration /* iteration */, 
                                                   0 /* snapshot */, 
                                                   0 /* reverse */);
 
@@ -39,12 +44,21 @@ fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
     int count;
 
     while (more) {
-        err = block_and_wait(future, "get_range_want_all_impl", "all");
+        err = block_and_wait(future, operation, "all");
         if (err)
             return err;
 
         err = fdb_future_get_keyvalue_array(future, &outputs, &count, &more);
-        printf("[DEBUG] Get %d kv pairs within %s - %s, more: %d\n", count, begin_key, end_key, more);
+        if (err) {
+            fdb_future_destroy(future);
+            return err;
+        } 
+
+        if (count > 0) {
+            //printf("[DEBUG] Get %d kv pairs within %s - %s, more: %d\n", count, outputs[0].key, outputs[count-1].key, more);
+        } else {
+            printf("[WARN] Get 0 pairs even with more indicator from previous run.\n");
+        }
         total_count += count;
 
         if (more) {
@@ -57,10 +71,10 @@ fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
                                                            2 /* end_key_name_length */, 
                                                            0 /* end_or_equal */, 
                                                            1 /* end_offset */, 
-                                                           0 /* limit */, 
+                                                           limit /* limit */, 
                                                            0 /* target_bytes */, 
-                                                           FDB_STREAMING_MODE_WANT_ALL, 
-                                                           0 /* iteration */, 
+                                                           mode /* mode */, 
+                                                           ++iteration /* iteration */, 
                                                            0 /* snapshot */, 
                                                            0 /* reverse */);
 
@@ -74,13 +88,53 @@ fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
     }
 
     fdb_future_destroy(future);
+    return err;
+}
 
-    return 0;
+fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
+    return get_range_impl(tr, FDB_STREAMING_MODE_WANT_ALL, "get_range_want_all");
+}
+
+fdb_error_t get_range_iterator_impl(FDBTransaction* tr) {
+    return get_range_impl(tr, FDB_STREAMING_MODE_ITERATOR, "get_range_iterator");
+}
+
+fdb_error_t get_range_exact_impl(FDBTransaction* tr) {
+    return get_range_impl(tr, FDB_STREAMING_MODE_EXACT, "get_range_exact");
+}
+
+fdb_error_t get_range_small_impl(FDBTransaction* tr) {
+    return get_range_impl(tr, FDB_STREAMING_MODE_SMALL, "get_range_small");
+}
+
+fdb_error_t get_range_medium_impl(FDBTransaction* tr) {
+    return get_range_impl(tr, FDB_STREAMING_MODE_MEDIUM, "get_range_medium");
+}
+
+fdb_error_t get_range_large_impl(FDBTransaction* tr) {
+    return get_range_impl(tr, FDB_STREAMING_MODE_LARGE, "get_range_large");
+}
+
+fdb_error_t get_range_serial_impl(FDBTransaction* tr) {
+    return get_range_impl(tr, FDB_STREAMING_MODE_SERIAL, "get_range_serial");
 }
 
 void do_benchmark(FDBDatabase* db) {
-    BenchmarkRecord r1 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_want_all_impl, "get_range_mode_want_all_impl_10k");
+    BenchmarkRecord r1 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_want_all_impl, "get_range_mode_want_all_impl_10k_1txn");
+    BenchmarkRecord r2 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_iterator_impl, "get_range_mode_iterator_impl_10k_1txn");
+    BenchmarkRecord r3 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_exact_impl, "get_range_mode_exact_impl_10k_1txn");
+    BenchmarkRecord r4 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_small_impl, "get_range_mode_small_impl_10k_1txn");
+    BenchmarkRecord r5 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_medium_impl, "get_range_mode_medium_impl_10k_1txn");
+    BenchmarkRecord r6 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_large_impl, "get_range_mode_large_impl_10k_1txn");
+    BenchmarkRecord r7 = benchmark(db, KEY_COUNT, KEY_COUNT, get_range_serial_impl, "get_range_mode_serial_impl_10k_1txn");
+
     printRecord(r1);
+    printRecord(r2);
+    printRecord(r3);
+    printRecord(r4);
+    printRecord(r5);
+    printRecord(r6);
+    printRecord(r7);
 }
 
 fdb_error_t set_impl(FDBTransaction* tr) {
