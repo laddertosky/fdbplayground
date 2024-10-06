@@ -1,4 +1,5 @@
 #include "common.h"
+#include <sys/time.h>
 
 // FDBCallback
 void check_obtained_value(FDBFuture* future, void* expected_raw) {
@@ -93,7 +94,7 @@ fdb_error_t set_default_transaction_option(FDBTransaction* tr) {
     return fdb_transaction_set_option(tr, FDB_TR_OPTION_RETRY_LIMIT, (const uint8_t*)&retry_limit, sizeof(uint64_t));
 }
 
-void run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), const char* task_description) {
+fdb_error_t run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), const char* task_description) {
     FDBTransaction* tr = NULL;
     exit_when_err(fdb_database_create_transaction(db, &tr), "fdb_database_create_transaction");
 
@@ -122,4 +123,46 @@ void run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), 
     }
 
     fdb_transaction_destroy(tr);
+    return err;
+}
+
+double getTimeMilliSec() {
+    static struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_usec / 1000.0 + tv.tv_sec * 1000.0;
+}
+
+BenchmarkRecord benchmark(FDBDatabase* db, int key_count, int batch_size, fdb_error_t (*task_impl)(FDBTransaction*), const char* task_description) {
+    BenchmarkRecord record;
+    record.err_count = 0;
+    record.item_count = 0;
+    record.transaction_count = 0;
+    record.description = task_description;
+
+    double start = getTimeMilliSec();
+    for (int i = 0; i < key_count / batch_size; i++) {
+        char description[64];
+        sprintf(description, "%s, batch %d", task_description, i+1);
+        fdb_error_t err = run_transaction(db, task_impl, description);
+        record.last_err = err;
+        if (err) {
+            record.err_count++;
+        }
+        record.transaction_count++;
+        record.item_count += batch_size;
+    }
+    double end = getTimeMilliSec();
+
+    record.total_response_time_msec = end - start;
+    return record;
+}
+
+void printRecord(BenchmarkRecord record) {
+    printf("\n[Benchmark] Task: %s ------------------\n", record.description);
+    printf("Last transaction status: %s\n", fdb_get_error(record.last_err));
+    printf("Item processed: %d\n", record.item_count);
+    printf("Transaction processed: %d\n", record.transaction_count);
+    printf("Total response time: %lf (ms)\n", record.total_response_time_msec);
+    printf("Average response time per 1k item: %lf (ms)\n", record.total_response_time_msec / record.item_count * 1000);
+    printf("-------------------End of Record-------------------\n\n");
 }
