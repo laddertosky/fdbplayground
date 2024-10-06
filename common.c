@@ -18,6 +18,8 @@ void check_obtained_value(FDBFuture* future, void* expected_raw) {
         printf("[WARN] Obtained different value size, key: %s, obtained_value_size: %d, expected_value_size: %d\n", expected->key, value_size, expected->value_length);
     } else if (memcmp(obtained, expected->value, expected->value_length) != 0) {
         printf("[WARN] Obtained different value, key: %s, obtained_value: %s, expected_value: %s\n", expected->key, obtained, expected->value);
+    } else {
+        // printf("[DEBUG] Obtained kv pair is matched: %s:%s", expected->key, obtained);
     }
 }
 
