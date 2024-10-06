@@ -6,8 +6,8 @@ To be familiar with foundationDB
 - :white_check_mark: Initialize fdb cluster with built binary. 
 - :white_check_mark: Issue KV operations (get, set, getrange, delete) with fdbcli.
 - :white_check_mark: Use [C API](https://apple.github.io/foundationdb/api-c.html) to issue KV operations (get, set, getrange, delete).
-- :white_large_square: Measure single getrange performance.
-- :white_large_square: Compare single vs multiple (parallel) getrange performance.
+- :white_check_mark: Measure single getrange performance.
+- :white_check_mark: Compare single vs multiple (parallel) getrange performance.
 - :white_large_square: Understand [read snapshot](https://apple.github.io/foundationdb/api-c.html#snapshot-reads).
 - :white_large_square: Understand [transaction conflict](https://apple.github.io/foundationdb/developer-guide.html#conflict-ranges).
 

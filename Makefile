@@ -11,6 +11,9 @@ basic.bin: basic_ops.o common.o
 single_get_range.bin: single_get_range.o common.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
+single_vs_multi_get_range.bin: single_vs_multi_get_range.o common.o
+	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 

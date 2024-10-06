@@ -1,0 +1,314 @@
+Use cluster file: ../foundationdb/build/fdb.cluster
+This program uses client version: 7.3.43,412531b5c97fa84343da94888cc949a4d29e8c29,fdb00b073000000
+
+Network thread started.
+Database create successfully.
+[INFO] transaction: set all 10k pairs committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 1 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 2 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 3 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 4 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 5 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 6 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 7 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 8 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 9 committed
+[INFO] transaction: sync_get_range_mode_want_all_impl_10k_10txn, batch 10 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 1 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 2 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 3 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 4 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 5 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 6 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 7 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 8 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 9 committed
+[INFO] transaction: sync_get_range_mode_iterator_impl_10k_10txn, batch 10 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 1 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 2 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 3 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 4 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 5 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 6 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 7 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 8 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 9 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_exact_impl_10k_10txn, batch 10 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 1 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 2 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 3 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 4 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 5 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 6 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 7 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 8 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 9 committed
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: sync_get_range_mode_small_impl_10k_10txn, batch 10 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 1 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 2 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 3 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 4 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 5 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 6 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 7 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 8 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 9 committed
+[INFO] transaction: sync_get_range_mode_medium_impl_10k_10txn, batch 10 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 1 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 2 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 3 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 4 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 5 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 6 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 7 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 8 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 9 committed
+[INFO] transaction: sync_get_range_mode_large_impl_10k_10txn, batch 10 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 1 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 2 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 3 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 4 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 5 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 6 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 7 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 8 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 9 committed
+[INFO] transaction: sync_get_range_mode_serial_impl_10k_10txn, batch 10 committed
+
+[Benchmark] Task: sync_get_range_mode_want_all_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 38.761963 (ms)
+Average response time per 1k item: 3.876196 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: sync_get_range_mode_iterator_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 25.264160 (ms)
+Average response time per 1k item: 2.526416 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: sync_get_range_mode_exact_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 17.376953 (ms)
+Average response time per 1k item: 1.737695 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: sync_get_range_mode_small_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 848.187988 (ms)
+Average response time per 1k item: 84.818799 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: sync_get_range_mode_medium_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 213.770996 (ms)
+Average response time per 1k item: 21.377100 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: sync_get_range_mode_large_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 83.278076 (ms)
+Average response time per 1k item: 8.327808 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: sync_get_range_mode_serial_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 20.133057 (ms)
+Average response time per 1k item: 2.013306 (ms)
+-------------------End of Record-------------------
+
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_want_all_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_iterator_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_exact_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[WARN] Get 0 pairs even with more indicator from previous run.
+[INFO] transaction: async_get_range_mode_small_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_medium_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_large_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+[INFO] transaction: async_get_range_mode_serial_impl_10k_10txn, batch 10 accepted, to commit
+
+[Benchmark] Task: async_get_range_mode_want_all_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 20.125977 (ms)
+Average response time per 1k item: 2.012598 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: async_get_range_mode_iterator_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 24.807861 (ms)
+Average response time per 1k item: 2.480786 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: async_get_range_mode_exact_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 24.382080 (ms)
+Average response time per 1k item: 2.438208 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: async_get_range_mode_small_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 785.605957 (ms)
+Average response time per 1k item: 78.560596 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: async_get_range_mode_medium_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 215.145020 (ms)
+Average response time per 1k item: 21.514502 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: async_get_range_mode_large_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 95.407959 (ms)
+Average response time per 1k item: 9.540796 (ms)
+-------------------End of Record-------------------
+
+
+[Benchmark] Task: async_get_range_mode_serial_impl_10k_10txn ------------------
+Last transaction status: Success
+Item processed: 10000
+Transaction processed: 10
+Total response time: 20.599854 (ms)
+Average response time per 1k item: 2.059985 (ms)
+-------------------End of Record-------------------
+
+[INFO] transaction: cleanup committed
+Network thread stopped.
