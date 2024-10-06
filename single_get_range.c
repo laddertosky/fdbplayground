@@ -84,7 +84,7 @@ fdb_error_t get_range_impl(FDBTransaction* tr, FDBStreamingMode mode, const char
     }
 
     if (total_count != KEY_COUNT) {
-        printf("[WARN] Obtained pairs count not match, expected: %d, actural: %d\n", KEY_COUNT, total_count);
+        printf("[WARN] Obtained pairs count not match, expected: %d, actual: %d\n", KEY_COUNT, total_count);
     }
 
     fdb_future_destroy(future);

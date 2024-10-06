@@ -17,6 +17,9 @@ single_vs_multi_get_range.bin: single_vs_multi_get_range.o common.o
 read_snapshot.bin: read_snapshot.o common.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
+tx_conflict.bin: tx_conflict.o common.o
+	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
