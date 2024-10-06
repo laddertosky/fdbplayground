@@ -237,6 +237,7 @@ BenchmarkRecord benchmark_async(FDBDatabase* db, int key_count, int batch_size, 
     record.total_response_time_msec = end - start;
     free(task_descriptions);
     free(tasks);
+    free(errs);
     return record;
 }
 
