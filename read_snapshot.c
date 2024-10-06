@@ -46,16 +46,16 @@ fdb_error_t update_impl(FDBTransaction* tr) {
     const char* UPDATE_FORMAT = "updated_%0*d";
 
     uint8_t updatedV2[VALUE_SIZE];
-    sprintf((char*) updatedV2, UPDATE_FORMAT, VALUE_SIZE-8, 2);
+    sprintf((char*) updatedV2, UPDATE_FORMAT, VALUE_SIZE-8, 1);
 
     uint8_t updatedV4[VALUE_SIZE];
-    sprintf((char*) updatedV2, UPDATE_FORMAT, VALUE_SIZE-8, 4);
+    sprintf((char*) updatedV2, UPDATE_FORMAT, VALUE_SIZE-8, 3);
 
     fdb_transaction_set(tr, keys[1], KEY_SIZE, updatedV2, VALUE_SIZE);
     fdb_transaction_set(tr, keys[3], KEY_SIZE, updatedV4, VALUE_SIZE);
 
-    to_wait.tv_sec = 1;
-    to_wait.tv_nsec = 0;
+    to_wait.tv_sec = 0;
+    to_wait.tv_nsec = 1000 * 1000 * 900;
     nanosleep(&to_wait, NULL);
     return err;
 }
