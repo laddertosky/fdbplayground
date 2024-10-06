@@ -25,7 +25,10 @@ FDBDatabase* setup(const char* cluster_file_path, pthread_t* network_thread);
 void teardown(pthread_t* network_thread);
 
 fdb_error_t set_default_transaction_option(FDBTransaction* tr);
-fdb_error_t run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), const char* task_description);
+
+typedef fdb_error_t(*TxnTask)(FDBTransaction*);
+fdb_error_t run_transaction(FDBDatabase* db, TxnTask run_impl, const char* task_description);
+fdb_error_t* async_run_multiple_transactions(FDBDatabase* db, TxnTask* run_impls, const char** task_descriptions, int transaction_count);
 
 double getTimeMilliSec();
 
@@ -39,4 +42,5 @@ typedef struct {
 } BenchmarkRecord;
 
 BenchmarkRecord benchmark(FDBDatabase* db, int key_count, int batch_size, fdb_error_t (*task_impl)(FDBTransaction*), const char* task_description);
+BenchmarkRecord benchmark_async(FDBDatabase* db, int key_count, int batch_size, TxnTask task_impl, const char* task_description);
 void printRecord(BenchmarkRecord record);

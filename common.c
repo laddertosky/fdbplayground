@@ -94,7 +94,56 @@ fdb_error_t set_default_transaction_option(FDBTransaction* tr) {
     return fdb_transaction_set_option(tr, FDB_TR_OPTION_RETRY_LIMIT, (const uint8_t*)&retry_limit, sizeof(uint64_t));
 }
 
-fdb_error_t run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransaction*), const char* task_description) {
+fdb_error_t* async_run_multiple_transactions(FDBDatabase* db, TxnTask* run_impls, const char** task_descriptions, int transaction_count) {
+    FDBTransaction** trs = (FDBTransaction**) malloc(sizeof(FDBTransaction*) * transaction_count);
+    FDBFuture** futures = (FDBFuture**) malloc(sizeof(FDBFuture*) * transaction_count);
+    int* completed = (int*) malloc(sizeof(int) * transaction_count);
+    fdb_error_t* errs = (fdb_error_t*) malloc(sizeof(fdb_error_t) * transaction_count);
+
+    for (int i = 0; i < transaction_count; i++) {
+        exit_when_err(fdb_database_create_transaction(db, &trs[i]), "fdb_database_create_transaction");
+        completed[i] = 0;
+
+        errs[i] = run_impls[i](trs[i]);
+        if (errs[i]) {
+            futures[i] = fdb_transaction_on_error(trs[i], errs[i]);
+            printf("[ERROR] Something wrong in transaction: %s, to rollback... Description: %s\n", task_descriptions[i], fdb_get_error(errs[i]));
+        } else {
+            futures[i] = fdb_transaction_commit(trs[i]);
+            printf("[INFO] transaction: %s accepted, to commit\n", task_descriptions[i]);
+        }
+    }
+
+    int completed_count = 0;
+
+    struct timespec to_wait;
+    to_wait.tv_sec = 0;
+    to_wait.tv_nsec = 10000;
+    struct timespec remains;
+
+    while (completed_count < transaction_count) {
+        for (int i = 0; i < transaction_count; i++) {
+            if (completed[i] == 0 && fdb_future_is_ready(futures[i])) {
+                completed[i] = 1;
+                completed_count++;
+            }
+        }
+
+        nanosleep(&to_wait, &remains);
+    }
+
+    for (int i = 0; i < transaction_count; i++) {
+        fdb_future_destroy(futures[i]);
+        fdb_transaction_destroy(trs[i]);
+    }
+
+    free(trs);    
+    free(futures);
+    free(completed);
+    return errs;
+}
+
+fdb_error_t run_transaction(FDBDatabase* db, TxnTask run_impl, const char* task_description) {
     FDBTransaction* tr = NULL;
     exit_when_err(fdb_database_create_transaction(db, &tr), "fdb_database_create_transaction");
 
@@ -108,18 +157,14 @@ fdb_error_t run_transaction(FDBDatabase* db, fdb_error_t (*run_impl)(FDBTransact
 
     // Error might come from commiting process, so don't merge with the above branch.
     if (err) {
-        printf("[ERROR] Something wrong in transaction: %s, to rollback... Descrition: %s\n", task_description, fdb_get_error(err));
+        printf("[ERROR] Something wrong in transaction: %s, to rollback... Description: %s\n", task_description, fdb_get_error(err));
 
         FDBFuture* future = fdb_transaction_on_error(tr, err);
 
-        fdb_error_t block_err = fdb_future_block_until_ready(future);
-        if (block_err) {
-            printf("[ERROR] During rolling back for transaction: %s. From blocking operation, description: %s\n", task_description, fdb_get_error(block_err));
-        } else {
-            fdb_error_t future_err = fdb_future_get_error(future);
-            printf("[ERROR] During rolling back for transaction: %s. From future operation, Description: %s\n", task_description, fdb_get_error(future_err));
+        fdb_error_t err2 = block_and_wait(future, "transaction", task_description);
+        if (!err2) {
+            fdb_future_destroy(future);
         }
-        fdb_future_destroy(future);
     }
 
     fdb_transaction_destroy(tr);
@@ -132,7 +177,7 @@ double getTimeMilliSec() {
     return tv.tv_usec / 1000.0 + tv.tv_sec * 1000.0;
 }
 
-BenchmarkRecord benchmark(FDBDatabase* db, int key_count, int batch_size, fdb_error_t (*task_impl)(FDBTransaction*), const char* task_description) {
+BenchmarkRecord benchmark(FDBDatabase* db, int key_count, int batch_size, TxnTask task_impl, const char* task_description) {
     BenchmarkRecord record;
     record.err_count = 0;
     record.item_count = 0;
@@ -154,6 +199,44 @@ BenchmarkRecord benchmark(FDBDatabase* db, int key_count, int batch_size, fdb_er
     double end = getTimeMilliSec();
 
     record.total_response_time_msec = end - start;
+    return record;
+}
+
+BenchmarkRecord benchmark_async(FDBDatabase* db, int key_count, int batch_size, TxnTask task_impl, const char* task_description) {
+    BenchmarkRecord record;
+    record.err_count = 0;
+    record.item_count = 0;
+    record.transaction_count = 0;
+    record.description = task_description;
+
+    double start = getTimeMilliSec();
+    int txn_count = (key_count + batch_size - 1) / batch_size;
+    const char** task_descriptions = (const char**) malloc(sizeof(char*) * txn_count);
+    TxnTask* tasks = (TxnTask*) malloc(sizeof(TxnTask*) * txn_count);
+
+    for (int i = 0; i < txn_count; i++) {
+        char description[64];
+        sprintf(description, "%s, batch %d", task_description, i+1);
+        task_descriptions[i] = description;
+        tasks[i] = task_impl;
+    }
+
+    fdb_error_t* errs = async_run_multiple_transactions(db, tasks, task_descriptions, txn_count);
+    record.last_err = errs[txn_count-1];
+    record.transaction_count = txn_count;
+    record.item_count = key_count;
+
+    for (int i = 0; i < txn_count; i++) {
+        if (errs[i]) {
+            record.err_count++;
+        }
+    }
+
+    double end = getTimeMilliSec();
+
+    record.total_response_time_msec = end - start;
+    free(task_descriptions);
+    free(tasks);
     return record;
 }
 
