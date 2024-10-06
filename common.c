@@ -153,8 +153,16 @@ fdb_error_t run_transaction(FDBDatabase* db, TxnTask run_impl, const char* task_
     if (!err) {
         FDBFuture* future = fdb_transaction_commit(tr);
         err = fdb_future_block_until_ready(future);
+        if (err) {
+            printf("[ERROR] During %s. From blocking operation, description: %s\n", task_description, fdb_get_error(err));
+        } else {
+            err = fdb_future_get_error(future);
+        }
+
+        if (!err) {
+            printf("[INFO] transaction: %s committed\n", task_description);
+        }
         fdb_future_destroy(future);
-        printf("[INFO] transaction: %s committed\n", task_description);
     }
 
     // Error might come from commiting process, so don't merge with the above branch.
