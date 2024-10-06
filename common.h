@@ -14,6 +14,7 @@
 
 void prepare_key_value(uint8_t** keys, int key_size, uint8_t** values, int value_size, int key_count);
 void destroy_key_value(uint8_t** keys, uint8_t** values, int key_count);
+fdb_error_t block_and_wait(FDBFuture* future, const char* operation, const char* key);
 
 // expected_raw should be FDBKeyValue*
 void check_obtained_value(FDBFuture* future, void* expected_raw);

@@ -67,21 +67,7 @@ fdb_error_t sync_get_impl(FDBTransaction* tr) {
         int index = rand() % KEY_COUNT; 
         uint8_t* key = keys[index];
         FDBFuture* future = fdb_transaction_get(tr, key, KEY_SIZE, 0);
-        fdb_error_t block_err = fdb_future_block_until_ready(future);
-
-        if (block_err) {
-            printf("[ERROR] During get: %s. From blocking operation, description: %s\n", key, fdb_get_error(block_err));
-            fdb_future_destroy(future);
-            return block_err;
-        } else {
-            fdb_error_t future_err = fdb_future_get_error(future);
-
-            if (future_err && !fdb_error_predicate(FDB_ERROR_PREDICATE_RETRYABLE, future_err))  {
-                printf("[ERROR] During get: %s. From future operation, Description: %s\n", key, fdb_get_error(future_err));
-                fdb_future_destroy(future);
-                return future_err;
-            }
-        }
+        err = block_and_wait(future, "sync_get_impl", (const char*) key);
 
         FDBKeyValue expected;
         expected.key = keys[index];
@@ -134,21 +120,9 @@ fdb_error_t getrange_impl(FDBTransaction* tr) {
                                                   0 /* snapshot */, 
                                                   0 /* reverse */);
 
-    fdb_error_t block_err = fdb_future_block_until_ready(future);
-
-    if (block_err) {
-        printf("[ERROR] During getrange. From blocking operation, description: %s\n", fdb_get_error(block_err));
-        fdb_future_destroy(future);
-        return block_err;
-    } else {
-        fdb_error_t future_err = fdb_future_get_error(future);
-
-        if (future_err && !fdb_error_predicate(FDB_ERROR_PREDICATE_RETRYABLE, future_err))  {
-            printf("[ERROR] During getrange. From future operation, description: %s\n", fdb_get_error(future_err));
-            fdb_future_destroy(future);
-            return future_err;
-        }
-    }
+    err = block_and_wait(future, "getrange_impl", "all");
+    if (err)
+        return err;
 
     const FDBKeyValue* outputs;
     fdb_bool_t more;
@@ -162,7 +136,7 @@ fdb_error_t getrange_impl(FDBTransaction* tr) {
 
     fdb_future_destroy(future);
 
-    return 0;
+    return err;
 }
 
 fdb_error_t delete_impl(FDBTransaction* tr) {

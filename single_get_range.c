@@ -39,24 +39,12 @@ fdb_error_t get_range_want_all_impl(FDBTransaction* tr) {
     int count;
 
     while (more) {
-        fdb_error_t block_err = fdb_future_block_until_ready(future);
-
-        if (block_err) {
-            printf("[ERROR] During getrange. From blocking operation, description: %s\n", fdb_get_error(block_err));
-            fdb_future_destroy(future);
-            return block_err;
-        } else {
-            fdb_error_t future_err = fdb_future_get_error(future);
-
-            if (future_err && !fdb_error_predicate(FDB_ERROR_PREDICATE_RETRYABLE, future_err))  {
-                printf("[ERROR] During getrange. From future operation, description: %s\n", fdb_get_error(future_err));
-                fdb_future_destroy(future);
-                return future_err;
-            }
-        }
+        err = block_and_wait(future, "get_range_want_all_impl", "all");
+        if (err)
+            return err;
 
         err = fdb_future_get_keyvalue_array(future, &outputs, &count, &more);
-        printf("[INFO] Get %d kv pairs within %s - %s, more: %d\n", count, begin_key, end_key, more);
+        printf("[DEBUG] Get %d kv pairs within %s - %s, more: %d\n", count, begin_key, end_key, more);
         total_count += count;
 
         if (more) {

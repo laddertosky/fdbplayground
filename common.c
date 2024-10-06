@@ -166,3 +166,22 @@ void printRecord(BenchmarkRecord record) {
     printf("Average response time per 1k item: %lf (ms)\n", record.total_response_time_msec / record.item_count * 1000);
     printf("-------------------End of Record-------------------\n\n");
 }
+
+fdb_error_t block_and_wait(FDBFuture *future, const char* operation, const char* key) {
+    fdb_error_t err = fdb_future_block_until_ready(future);
+
+    if (err) {
+        printf("[ERROR] During %s: %s. From blocking operation, description: %s\n", operation, key, fdb_get_error(err));
+        fdb_future_destroy(future);
+        return err;
+    } else {
+        err = fdb_future_get_error(future);
+
+        if (err && !fdb_error_predicate(FDB_ERROR_PREDICATE_RETRYABLE, err))  {
+            printf("[ERROR] During %s: %s. From future operation, Description: %s\n", operation, key, fdb_get_error(err));
+            fdb_future_destroy(future);
+            return err;
+        }
+    }
+    return err;
+}
