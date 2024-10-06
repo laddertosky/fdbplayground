@@ -8,7 +8,7 @@ To be familiar with foundationDB
 - :white_check_mark: Use [C API](https://apple.github.io/foundationdb/api-c.html) to issue KV operations (get, set, getrange, delete).
 - :white_check_mark: Measure single getrange performance.
 - :white_check_mark: Compare single vs multiple (parallel) getrange performance.
-- :white_large_square: Understand [read snapshot](https://apple.github.io/foundationdb/api-c.html#snapshot-reads).
+- :white_check_mark: Understand [read snapshot](https://apple.github.io/foundationdb/api-c.html#snapshot-reads).
 - :white_large_square: Understand [transaction conflict](https://apple.github.io/foundationdb/developer-guide.html#conflict-ranges).
 
 # Steps
