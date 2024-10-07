@@ -1,3 +1,34 @@
+## Task Setup
+Prerequisite: 10k pairs of key-value existed in the FDB cluster
+
+Use getrange from `\x00` - `\xff` to fetch all keys in the userspace.
+Try the following streaming mode to compare the performance.
+    FDB_STREAMING_MODE_WANT_ALL
+    FDB_STREAMING_MODE_ITERATOR (default)
+    FDB_STREAMING_MODE_EXACT 
+    FDB_STREAMING_MODE_SMALL
+    FDB_STREAMING_MODE_MEDIUM
+    FDB_STREAMING_MODE_LARGE
+    FDB_STREAMING_MODE_SERIAL
+
+## Comment
+
+| Mode                        | Response Time   |
+|:----------------------------|----------------:|
+| FDB_STREAMING_MODE_WANT_ALL |   20.854980 ms  |
+| FDB_STREAMING_MODE_ITERATOR |   12.334961 ms  |
+| FDB_STREAMING_MODE_EXACT    |   11.858887 ms  |
+| FDB_STREAMING_MODE_SMALL    |  815.907959 ms  |
+| FDB_STREAMING_MODE_MEDIUM   |  225.569824 ms  |
+| FDB_STREAMING_MODE_LARGE    |   73.516113 ms  |
+| FDB_STREAMING_MODE_SERIAL   |   15.108887 ms  |
+
+
+The default iterator methods provide the almost the fastest performance, slightly worse than the exact method.
+But in the exact mode, the limit of item should be explicitly provided by user, which is not always possible.
+ 
+## Execution Log
+```
 Use cluster file: ../foundationdb/build/fdb.cluster
 This program uses client version: 7.3.43,412531b5c97fa84343da94888cc949a4d29e8c29,fdb00b073000000
 
@@ -79,3 +110,4 @@ Average response time per 1k item: 1.510889 (ms)
 
 [INFO] transaction: cleanup committed
 Network thread stopped.
+```

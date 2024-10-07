@@ -1,10 +1,26 @@
+## Task setup
+Prerequisite: 4 pairs of key-value existed in the FDB cluster (K1, K2, K3, K4)
+
+Timeline:
+T1: Read K1, K2, K3
+T2: Update K2, K4
+T2 commit
+T1 commit
+
+## Comment
+I think the scenario for this sub-task will not demonstrate the power of snapshot read.
+Because T1 is read-only transaction, which will never be aborted.
+Therefore, both T1, T2 will not be aborted in this case.
+
+## Execution Log
+```
 Use cluster file: ../foundationdb/build/fdb.cluster
 This program uses client version: 7.3.43,412531b5c97fa84343da94888cc949a4d29e8c29,fdb00b073000000
 
 Network thread started.
 Database create successfully.
 [INFO] transaction: set_all_kv_pairs committed
-[INFO] Auxilary thread is started.
+[INFO] Auxiliary thread is started.
 [DEBUG] Obtained kv pair is matched: key_0:value_000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 [DEBUG] Obtained kv pair is matched: key_1:value_000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
 [DEBUG] Obtained kv pair is matched: key_2:value_000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002
@@ -19,3 +35,4 @@ Database create successfully.
 [INFO] transaction: read_all_for_checking_committed committed
 [INFO] transaction: cleanup committed
 Network thread stopped.
+```

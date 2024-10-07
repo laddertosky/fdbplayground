@@ -1,3 +1,34 @@
+## Task setup
+Prerequisite: 10k pairs of key-value existed in the FDB cluster
+
+Use getrange to fetch 1k keys each and send multiple(10) transactions to get all pairs.
+Try the following streaming mode to compare the performance.
+    `FDB_STREAMING_MODE_WANT_ALL`
+    `FDB_STREAMING_MODE_ITERATOR` (default)
+    `FDB_STREAMING_MODE_EXACT `
+    `FDB_STREAMING_MODE_SMALL`
+    `FDB_STREAMING_MODE_MEDIUM`
+    `FDB_STREAMING_MODE_LARGE`
+    `FDB_STREAMING_MODE_SERIAL`
+
+## Reply
+I use two ways to issues those 10 transactions, one in synchronous and another in asynchronous.
+
+| Mode                        | synchronous     | asynchronous      | single_range(for reference) |
+|:----------------------------|----------------:|------------------:|----------------------------:|
+| FDB_STREAMING_MODE_WANT_ALL |   38.761963 ms  |     20.125977 ms  |      20.854980 ms  |
+| FDB_STREAMING_MODE_ITERATOR |   25.264160 ms  |     24.807861 ms  |      12.334961 ms  |
+| FDB_STREAMING_MODE_EXACT    |   17.376953 ms  |     24.382080 ms  |      11.858887 ms  |
+| FDB_STREAMING_MODE_SMALL    |  848.187988 ms  |    785.605957 ms  |     815.907959 ms  |
+| FDB_STREAMING_MODE_MEDIUM   |  213.770996 ms  |    215.145020 ms  |     225.569824 ms  |
+| FDB_STREAMING_MODE_LARGE    |   83.278076 ms  |     95.407959 ms  |      73.516113 ms  |
+| FDB_STREAMING_MODE_SERIAL   |   20.133057 ms  |     20.599854 ms  |      15.108887 ms  |
+
+
+Most of the case, asynchoronus calls for multiple transactions does not provide better performance
+ 
+## Execution Log
+```
 Use cluster file: ../foundationdb/build/fdb.cluster
 This program uses client version: 7.3.43,412531b5c97fa84343da94888cc949a4d29e8c29,fdb00b073000000
 
@@ -312,3 +343,4 @@ Average response time per 1k item: 2.059985 (ms)
 
 [INFO] transaction: cleanup committed
 Network thread stopped.
+```
