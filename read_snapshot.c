@@ -52,18 +52,13 @@ fdb_error_t update_impl(FDBTransaction* tr) {
     fdb_transaction_set(tr, keys[1], KEY_SIZE, updatedV2, VALUE_SIZE);
     fdb_transaction_set(tr, keys[3], KEY_SIZE, updatedV4, VALUE_SIZE);
 
+    printf("[DEBUG] %s updated\n", keys[1]);
+    printf("[DEBUG] %s updated\n", keys[3]);
+
     to_wait.tv_sec = 0;
-    to_wait.tv_nsec = 1000 * 1000 * 900;
+    to_wait.tv_nsec = 1000 * 1000 * 400;
     nanosleep(&to_wait, NULL);
     return err;
-}
-
-void* try_update(void* db_raw) {
-    FDBDatabase* db = (FDBDatabase*) db_raw;
-
-    printf("[INFO] Try to update from auxilary thread.\n");
-    run_transaction(db, update_impl, "update concurrently");
-    return NULL;
 }
 
 fdb_error_t read_impl(FDBTransaction* tr) {
@@ -87,8 +82,8 @@ fdb_error_t read_impl(FDBTransaction* tr) {
 
     // create larger window for update to interupt
     struct timespec to_wait;
-    to_wait.tv_sec = 0;
-    to_wait.tv_nsec = 1000 * 1000 * 500;
+    to_wait.tv_sec = 1;
+    to_wait.tv_nsec = 0;
     nanosleep(&to_wait, NULL);
 
     return err;
@@ -98,7 +93,7 @@ void* aux_run(void* db_raw) {
     FDBDatabase* db = (FDBDatabase*) db_raw;
 
     printf("[INFO] Auxilary thread is started.\n");
-    run_transaction(db, read_impl, "read_only_will_not_be_aborted");
+    run_transaction(db, read_impl, "read_only_without_snapshot_will_not_be_aborted");
     return NULL;
 }
 
@@ -191,10 +186,11 @@ fdb_error_t get_range_impl(FDBTransaction* tr) {
 
 /*
     * Timeline ---main----------100ms------500ms-------1sec-------
-    * Read        Begin send              Commit 
-    * Update      Begin         send                  Commit
+    * T1:Read     Begin         send                  Commit 
+    * T2:Update   Begin send              Commit
     Both transaction should not be aborted.
-    Because fdb applies MVCC and there is a previous version of keys for read txn.
+*   T1: Readonly transaction will never be aborted.
+*   T2: There is no other conflicting transaction try to write the same keys.
 */
 int main(int argc, char** argv) {
     pthread_t network_thread;
@@ -225,6 +221,7 @@ int main(int argc, char** argv) {
         exit(2);
     }
 
+    run_transaction(db, get_range_impl, "read_all_for_checking_committed");
     run_transaction(db, delete_range_impl, "cleanup");
     destroy_key_value(keys, values, KEY_COUNT);
     teardown(&network_thread);

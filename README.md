@@ -8,8 +8,8 @@ To be familiar with foundationDB
 - :white_check_mark: Use [C API](https://apple.github.io/foundationdb/api-c.html) to issue KV operations (get, set, getrange, delete).
 - :white_check_mark: Measure single getrange performance.
 - :white_check_mark: Compare single vs multiple (parallel) getrange performance.
-- :white_check_mark: Understand [read snapshot](https://apple.github.io/foundationdb/api-c.html#snapshot-reads).
-- :white_large_square: Understand [transaction conflict](https://apple.github.io/foundationdb/developer-guide.html#conflict-ranges).
+- :white_check_mark: Understand [read snapshot](https://apple.github.io/foundationdb/developer-guide.html#snapshot-isolation).
+- :white_check_mark: Understand [transaction conflict](https://apple.github.io/foundationdb/developer-guide.html#conflict-ranges).
 
 # Steps
 ## preparation
@@ -144,6 +144,7 @@ sudo cmake --install ./bindings/c/
 ```
 
 ## Development note
-1. In getrange, the if we want to obtain the whole user key ranges [\x00, \xff), even though using \xff with 0 end_or_equal, fdb will throw "Key outside legal range.
+1. In getrange, if we want to obtain the whole user key ranges [\x00, \xff), even though using \xff with 0 end_or_equal, fdb will throw "Key outside legal range. Currently I use \xfe as end key, because I don't use key starting with \xfe.
 
+2. It's not uncommon to forget `fdb_future_block_until_ready(FDBFuture*)` normally will not return error code, even so, it does not return the error about the corresponding future. Use `fdb_future_get_error(FDBFuture*)` to obtain the required error code, especially for the future from `fdb_transaction_commit(FDBTransaction* tr)`.
 
