@@ -89,7 +89,7 @@ mkdir build
 
 ```
 
-8. Build with the following instruction, USE_WERROR is not set due to the waring messages from deprecated calls since OpenSSL 3.0:
+8. Build with the following instruction, USE_WERROR is not set due to the warning messages from deprecated calls since OpenSSL 3.0:
 ```
 cd build
 cmake -G Ninja ..
@@ -128,7 +128,7 @@ fdb> configure new single ssd
 ```
 Note that there is no corresponding log shown in the fdbmonitor, which is also confusing.
 
-3. Then we could type status in fdbcli to check the database status. If we exit the fdbcli and reentry, the welcome message will includ 'The database is available.'.
+3. Then we could type status in fdbcli to check the database status. If we exit the fdbcli and reentry, the welcome message will include 'The database is available.'.
 
 ```
 fdb> status

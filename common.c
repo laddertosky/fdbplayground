@@ -166,7 +166,7 @@ fdb_error_t run_transaction(FDBDatabase* db, TxnTask run_impl, const char* task_
         fdb_future_destroy(future);
     }
 
-    // Error might come from commiting process, so don't merge with the above branch.
+    // Error might come from committing process, so don't merge with the above branch.
     if (err) {
         printf("[ERROR] Something wrong in transaction: %s, to rollback... Description: %s\n", task_description, fdb_get_error(err));
 

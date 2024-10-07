@@ -80,7 +80,7 @@ fdb_error_t read_impl(FDBTransaction* tr) {
         fdb_future_destroy(future);
     }
 
-    // create larger window for update to interupt
+    // create larger window for update to interrupt
     struct timespec to_wait;
     to_wait.tv_sec = 1;
     to_wait.tv_nsec = 0;
@@ -92,7 +92,7 @@ fdb_error_t read_impl(FDBTransaction* tr) {
 void* aux_run(void* db_raw) {
     FDBDatabase* db = (FDBDatabase*) db_raw;
 
-    printf("[INFO] Auxilary thread is started.\n");
+    printf("[INFO] Auxiliary thread is started.\n");
     run_transaction(db, read_impl, "read_only_without_snapshot_will_not_be_aborted");
     return NULL;
 }
@@ -206,18 +206,18 @@ int main(int argc, char** argv) {
     prepare_key_value(keys, KEY_SIZE, values, VALUE_SIZE, KEY_COUNT);
     run_transaction(db, set_impl, "set_all_kv_pairs");
 
-    pthread_t auxilary_thread;
-    int err_pthread = pthread_create(&auxilary_thread, NULL, (void*) &aux_run, db);
+    pthread_t auxiliary_thread;
+    int err_pthread = pthread_create(&auxiliary_thread, NULL, (void*) &aux_run, db);
     if (err_pthread) {
-        printf("[FATAL] During creating auxilary thread. Description: %s\n", strerror(err_pthread));
+        printf("[FATAL] During creating auxiliary thread. Description: %s\n", strerror(err_pthread));
         exit(2);
     }
 
     run_transaction(db, update_impl, "update_try_to_cause_conflict");
     
-    err_pthread = pthread_join(auxilary_thread, NULL);
+    err_pthread = pthread_join(auxiliary_thread, NULL);
     if (err_pthread) {
-        printf("[FATAL] During joining the auxilary thread. err: %s\n", strerror(err_pthread));
+        printf("[FATAL] During joining the auxiliary thread. err: %s\n", strerror(err_pthread));
         exit(2);
     }
 

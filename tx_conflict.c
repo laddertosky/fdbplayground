@@ -73,7 +73,7 @@ fdb_error_t readK1_updateK2(FDBTransaction* tr) {
     sprintf((char*) updatedV2, UPDATE_FORMAT, VALUE_SIZE-8-1, 1);
     fdb_transaction_set(tr, keys[1], KEY_SIZE, updatedV2, VALUE_SIZE);
 
-    // create larger window for another txn to interupt
+    // create larger window for another txn to interrupt
     struct timespec to_wait;
     to_wait.tv_sec = 1;
     to_wait.tv_nsec = 0;
@@ -131,7 +131,7 @@ fdb_error_t read_both(FDBTransaction* tr) {
 void* aux_run(void* db_raw) {
     FDBDatabase* db = (FDBDatabase*) db_raw;
 
-    printf("[INFO] Try to send txn from auxilary thread.\n");
+    printf("[INFO] Try to send txn from auxiliary thread.\n");
     run_transaction(db, readK2_updateK1, "read_K2_update_K1");
     return NULL;
 }
@@ -157,17 +157,17 @@ int main(int argc, char** argv) {
     prepare_key_value(keys, KEY_SIZE, values, VALUE_SIZE, KEY_COUNT);
     run_transaction(db, set_impl, "set_all_kv_pairs");
 
-    pthread_t auxilary_thread;
-    int err_pthread = pthread_create(&auxilary_thread, NULL, (void*) &aux_run, db);
+    pthread_t auxiliary_thread;
+    int err_pthread = pthread_create(&auxiliary_thread, NULL, (void*) &aux_run, db);
     if (err_pthread) {
-        printf("[FATAL] During creating auxilary thread. Description: %s\n", strerror(err_pthread));
+        printf("[FATAL] During creating auxiliary thread. Description: %s\n", strerror(err_pthread));
         exit(2);
     }
     run_transaction(db, readK1_updateK2, "read_K1_update_K2_should_be_aborted");
     
-    err_pthread = pthread_join(auxilary_thread, NULL);
+    err_pthread = pthread_join(auxiliary_thread, NULL);
     if (err_pthread) {
-        printf("[FATAL] During joining the auxilary thread. err: %s\n", strerror(err_pthread));
+        printf("[FATAL] During joining the auxiliary thread. err: %s\n", strerror(err_pthread));
         exit(2);
     }
 
