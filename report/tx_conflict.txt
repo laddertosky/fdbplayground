@@ -1,0 +1,14 @@
+Use cluster file: ../foundationdb/build/fdb.cluster
+This program uses client version: 7.3.43,412531b5c97fa84343da94888cc949a4d29e8c29,fdb00b073000000
+
+Network thread started.
+Database create successfully.
+[INFO] transaction: set_all_kv_pairs committed
+[INFO] Try to send txn from auxilary thread.
+[INFO] transaction: read_K2_update_K1 committed
+[ERROR] Something wrong in transaction: read_K1_update_K2_should_be_aborted, to rollback... Description: Transaction not committed due to conflict with another transaction
+[DEBUG] obtained V1: updated_0000000000000000000000000000000
+[DEBUG] obtained V2: value_000000000000000000000000000000001
+[INFO] transaction: read_both_for_check committed
+[INFO] transaction: cleanup committed
+Network thread stopped.

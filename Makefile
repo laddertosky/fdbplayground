@@ -4,6 +4,7 @@ CFLAGS := -Wall -Wextra -std=c11 -g
 LDFLAGS := 
 LIBS := -lfdb_c -lm -lrt -pthread
 
+all: basic.bin single_get_range.bin single_vs_multi_get_range.bin read_snapshot.bin tx_conflict.bin
 
 basic.bin: basic_ops.o common.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)

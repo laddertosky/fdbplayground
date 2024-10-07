@@ -1,6 +1,4 @@
 #include "common.h"
-#include "time.h"
-#include <foundationdb/fdb_c_types.h>
 #define KEY_COUNT 2
 #define KEY_SIZE 12
 #define VALUE_SIZE 40
@@ -37,19 +35,20 @@ fdb_error_t readK2_updateK1(FDBTransaction* tr) {
     if (err)
         return err;
 
-    // ensure the read operation is executed (but not yet committed) first
     struct timespec to_wait;
     to_wait.tv_sec = 0;
     to_wait.tv_nsec = 1000 * 1000 * 100;
     nanosleep(&to_wait, NULL);
 
     FDBFuture* future = fdb_transaction_get(tr, keys[1], KEY_SIZE, 0);
-    err = block_and_wait(future, "read K2", (const char*) keys[1]);
+    err = block_and_wait(future, "read_K2", (const char*) keys[1]);
     fdb_future_destroy(future);
+    if (err)
+        return err;
 
     const char* UPDATE_FORMAT = "updated_%0*d";
     uint8_t updatedV1[VALUE_SIZE];
-    sprintf((char*) updatedV1, UPDATE_FORMAT, VALUE_SIZE-8, 0);
+    sprintf((char*) updatedV1, UPDATE_FORMAT, VALUE_SIZE-8-1, 0);
     fdb_transaction_set(tr, keys[0], KEY_SIZE, updatedV1, VALUE_SIZE);
 
     to_wait.tv_sec = 0;
@@ -64,15 +63,17 @@ fdb_error_t readK1_updateK2(FDBTransaction* tr) {
         return err;
 
     FDBFuture* future = fdb_transaction_get(tr, keys[0], KEY_SIZE, 0);
-    err = block_and_wait(future, "read K1", (const char*) keys[0]);
+    err = block_and_wait(future, "read_K1", (const char*) keys[0]);
     fdb_future_destroy(future);
+    if (err)
+        return err;
 
     const char* UPDATE_FORMAT = "updated_%0*d";
     uint8_t updatedV2[VALUE_SIZE];
-    sprintf((char*) updatedV2, UPDATE_FORMAT, VALUE_SIZE-8, 1);
+    sprintf((char*) updatedV2, UPDATE_FORMAT, VALUE_SIZE-8-1, 1);
     fdb_transaction_set(tr, keys[1], KEY_SIZE, updatedV2, VALUE_SIZE);
 
-    // create larger window for update to interupt
+    // create larger window for another txn to interupt
     struct timespec to_wait;
     to_wait.tv_sec = 1;
     to_wait.tv_nsec = 0;
@@ -106,24 +107,24 @@ fdb_error_t read_both(FDBTransaction* tr) {
     fdb_future_destroy(future);
 
     FDBFuture* future2 = fdb_transaction_get(tr, keys[1], KEY_SIZE, 0);
-    err = block_and_wait(future, "read K2", (const char*) keys[1]);
+    err = block_and_wait(future2, "read K2", (const char*) keys[1]);
 
     if (err) {
-        fdb_future_destroy(future);
+        fdb_future_destroy(future2);
         return err;
     }
 
     err = fdb_future_get_value(future2, &presented, &obtained, &value_size);
 
     if (err) {
-        fdb_future_destroy(future);
+        fdb_future_destroy(future2);
         return err;
     }
 
     if (presented) {
         printf("[DEBUG] obtained V2: %s\n", obtained);
     }
-    fdb_future_destroy(future);
+    fdb_future_destroy(future2);
     return err;
 }
 
@@ -131,7 +132,7 @@ void* aux_run(void* db_raw) {
     FDBDatabase* db = (FDBDatabase*) db_raw;
 
     printf("[INFO] Try to send txn from auxilary thread.\n");
-    run_transaction(db, readK2_updateK1, "read K2 update K1");
+    run_transaction(db, readK2_updateK1, "read_K2_update_K1");
     return NULL;
 }
 
@@ -154,7 +155,7 @@ int main(int argc, char** argv) {
 
     FDBDatabase* db = setup(cluster_file_path, &network_thread);
     prepare_key_value(keys, KEY_SIZE, values, VALUE_SIZE, KEY_COUNT);
-    run_transaction(db, set_impl, "set all kv pairs");
+    run_transaction(db, set_impl, "set_all_kv_pairs");
 
     pthread_t auxilary_thread;
     int err_pthread = pthread_create(&auxilary_thread, NULL, (void*) &aux_run, db);
@@ -162,7 +163,7 @@ int main(int argc, char** argv) {
         printf("[FATAL] During creating auxilary thread. Description: %s\n", strerror(err_pthread));
         exit(2);
     }
-    run_transaction(db, readK1_updateK2, "read K1 update K2");
+    run_transaction(db, readK1_updateK2, "read_K1_update_K2_should_be_aborted");
     
     err_pthread = pthread_join(auxilary_thread, NULL);
     if (err_pthread) {
@@ -170,8 +171,8 @@ int main(int argc, char** argv) {
         exit(2);
     }
 
-    run_transaction(db, read_both, "read both for check");
-    //run_transaction(db, delete_range_impl, "cleanup");
+    run_transaction(db, read_both, "read_both_for_check");
+    run_transaction(db, delete_range_impl, "cleanup");
     destroy_key_value(keys, values, KEY_COUNT);
     teardown(&network_thread);
 }

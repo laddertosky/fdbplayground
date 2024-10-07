@@ -33,12 +33,10 @@ void prepare_key_value(uint8_t** keys, int key_size, uint8_t** values, int value
     for (int i = 0; i < key_count; i++) {
         uint8_t* key = (uint8_t*) malloc(sizeof(uint8_t) * (key_size));
         sprintf((char*) key, KEY_FORMAT, key_size-KEY_PREFIX_SIZE-1, i);
-        key[key_size] = '\0';
         keys[i] = key;
 
         uint8_t* value = (uint8_t*) malloc(sizeof(uint8_t) * (value_size));
         sprintf((char*) value, VALUE_FORMAT, value_size-VALUE_PREFIX_SIZE-1, i);
-        value[value_size] = '\0';
         values[i] = value;
     }
 }
