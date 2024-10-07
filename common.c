@@ -1,5 +1,6 @@
 #include "common.h"
 #include <sys/time.h>
+#include <time.h>
 
 // FDBCallback
 void check_obtained_value(FDBFuture* future, void* expected_raw) {
@@ -19,7 +20,7 @@ void check_obtained_value(FDBFuture* future, void* expected_raw) {
     } else if (memcmp(obtained, expected->value, expected->value_length) != 0) {
         printf("[WARN] Obtained different value, key: %s, obtained_value: %s, expected_value: %s\n", expected->key, obtained, expected->value);
     } else {
-        // printf("[DEBUG] Obtained kv pair is matched: %s:%s", expected->key, obtained);
+        printf("[DEBUG] Obtained kv pair is matched: %s:%s\n", expected->key, obtained);
     }
 }
 
@@ -30,12 +31,14 @@ void prepare_key_value(uint8_t** keys, int key_size, uint8_t** values, int value
     const char* VALUE_FORMAT = "value_%0*d";
 
     for (int i = 0; i < key_count; i++) {
-        uint8_t* key = (uint8_t*) malloc(sizeof(uint8_t) * (1+key_size));
-        sprintf((char*) key, KEY_FORMAT, key_size-KEY_PREFIX_SIZE, i);
+        uint8_t* key = (uint8_t*) malloc(sizeof(uint8_t) * (key_size));
+        sprintf((char*) key, KEY_FORMAT, key_size-KEY_PREFIX_SIZE-1, i);
+        key[key_size] = '\0';
         keys[i] = key;
 
-        uint8_t* value = (uint8_t*) malloc(sizeof(uint8_t) * (1+value_size));
-        sprintf((char*) value, VALUE_FORMAT, value_size-VALUE_PREFIX_SIZE, i);
+        uint8_t* value = (uint8_t*) malloc(sizeof(uint8_t) * (value_size));
+        sprintf((char*) value, VALUE_FORMAT, value_size-VALUE_PREFIX_SIZE-1, i);
+        value[value_size] = '\0';
         values[i] = value;
     }
 }
