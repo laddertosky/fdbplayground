@@ -1,8 +1,6 @@
 #include "common.h"
-#include "time.h"
-#include <foundationdb/fdb_c_types.h>
 #define KEY_COUNT 4
-#define KEY_SIZE 12
+#define KEY_SIZE 6
 #define VALUE_SIZE 100
 
 uint8_t* keys[KEY_COUNT];
@@ -96,6 +94,101 @@ fdb_error_t read_impl(FDBTransaction* tr) {
     return err;
 }
 
+void* aux_run(void* db_raw) {
+    FDBDatabase* db = (FDBDatabase*) db_raw;
+
+    printf("[INFO] Auxilary thread is started.\n");
+    run_transaction(db, read_impl, "read_only_will_not_be_aborted");
+    return NULL;
+}
+
+fdb_error_t get_range_impl(FDBTransaction* tr) {
+    fdb_error_t err = set_default_transaction_option(tr);
+    if (err)
+        return err;
+
+    uint8_t begin_key[2] = "\x00";
+
+    // the server will not accept end_key with \xff, even with 0 end_or_equal, is that a bug?
+    uint8_t end_key[2] = "\xfe";
+
+    // will be ignored when mode is not FDB_STREAMING_MODE_ITERATOR
+    int iteration = 0;
+
+    int limit = 0;
+
+    FDBFuture* future = fdb_transaction_get_range(tr, 
+                                                  begin_key /* begin_key_name */, 
+                                                  2 /* begin_key_name_length */, 
+                                                  1 /* begin_or_equal */,
+                                                  0 /* begin_offset */,
+                                                  end_key /* end_key_name */, 
+                                                  2 /* end_key_name_length */, 
+                                                  1 /* end_or_equal */, 
+                                                  1 /* end_offset */, 
+                                                  limit /* limit */, 
+                                                  0 /* target_bytes */, 
+                                                  FDB_STREAMING_MODE_ITERATOR /* mode */, 
+                                                  ++iteration /* iteration */, 
+                                                  0 /* snapshot */, 
+                                                  0 /* reverse */);
+
+    const FDBKeyValue* outputs;
+    fdb_bool_t more = 1;
+    int total_count = 0;
+    int count;
+
+    while (more) {
+        err = block_and_wait(future, "get_range_all", "all");
+        if (err)
+            return err;
+
+        err = fdb_future_get_keyvalue_array(future, &outputs, &count, &more);
+        if (err) {
+            fdb_future_destroy(future);
+            return err;
+        } 
+
+        if (count > 0) {
+            for (int i = 0; i < count; i++) {
+                // why the first three values contains \n in the output?
+                printf("[DEBUG] Obtained %s:%s\n", outputs[i].key, outputs[i].value);
+            }
+        } else {
+            printf("[WARN] Get 0 pairs even with more indicator from previous run.\n");
+        }
+        total_count += count;
+
+        if (more) {
+            FDBFuture* future2 = fdb_transaction_get_range(tr, 
+                                                           outputs[count-1].key /* begin_key_name */, 
+                                                           outputs[count-1].key_length /* begin_key_name_length */, 
+                                                           1 /* begin_or_equal */,
+                                                           1 /* begin_offset */,
+                                                           end_key /* end_key_name */,
+                                                           2 /* end_key_name_length */, 
+                                                           1 /* end_or_equal */, 
+                                                           1 /* end_offset */, 
+                                                           limit /* limit */, 
+                                                           0 /* target_bytes */, 
+                                                           FDB_STREAMING_MODE_ITERATOR /* mode */, 
+                                                           ++iteration /* iteration */, 
+                                                           0 /* snapshot */, 
+                                                           0 /* reverse */);
+
+            fdb_future_destroy(future);
+            future = future2;
+        }
+    }
+
+    if (total_count != KEY_COUNT) {
+        printf("[WARN] Obtained pairs count not match, expected: %d, actual: %d\n", KEY_COUNT, total_count);
+    }
+
+    fdb_future_destroy(future);
+    return err;
+}
+
 /*
     * Timeline ---main----------100ms------500ms-------1sec-------
     * Read        Begin send              Commit 
@@ -115,18 +208,18 @@ int main(int argc, char** argv) {
 
     FDBDatabase* db = setup(cluster_file_path, &network_thread);
     prepare_key_value(keys, KEY_SIZE, values, VALUE_SIZE, KEY_COUNT);
-    run_transaction(db, set_impl, "set all kv pairs");
+    run_transaction(db, set_impl, "set_all_kv_pairs");
 
-
-    pthread_t write_thread;
-    int err_pthread = pthread_create(&write_thread, NULL, (void*) &try_update, db);
+    pthread_t auxilary_thread;
+    int err_pthread = pthread_create(&auxilary_thread, NULL, (void*) &aux_run, db);
     if (err_pthread) {
         printf("[FATAL] During creating auxilary thread. Description: %s\n", strerror(err_pthread));
         exit(2);
     }
-    run_transaction(db, read_impl, "slow read txn");
+
+    run_transaction(db, update_impl, "update_try_to_cause_conflict");
     
-    err_pthread = pthread_join(write_thread, NULL);
+    err_pthread = pthread_join(auxilary_thread, NULL);
     if (err_pthread) {
         printf("[FATAL] During joining the auxilary thread. err: %s\n", strerror(err_pthread));
         exit(2);
