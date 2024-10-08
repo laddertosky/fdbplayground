@@ -1,11 +1,32 @@
 ## Task Setup
 Prerequisite: 2 pairs of key-value existed in the FDB cluster (K1, K2)
 
-Timeline:
-T1: Read K1, Update K2
-T2: Read K2, Update K1
-T2 commit
-T1 commit
+```mermaid
+sequenceDiagram
+    actor T1 as Thread1
+    participant fdb as FDBCluster
+    actor T2 as Thread2
+
+    Note over fdb: K1, K2 (Version 100)
+    
+    T1->>fdb: Create Transaction<br>T1
+    T2->>fdb: Create Transaction<br>T2
+
+    T1->>fdb: Read K1, Update K2 
+    fdb->>T1: V1 (Version 100)
+
+    T2->>fdb: Read K2, Update K1
+    fdb->>T2: V2 (Version 100)
+
+    T2->>fdb: Commit Transaction<br>T2
+    fdb->>T2: Accepted (Version 101)
+    
+    Note over fdb: K1 (Version 101)<br>K2 (Version 100)
+
+    T1->>fdb: Commit Transaction<br>T1
+    fdb->>T1: Aborted (Conflict on K1)
+
+```
 
 ## Comment
 T2 will not be aborted because it commits first. However, T1 will be aborted because this transaction read the value that involved in the update operation in the previous committed transaction T2. T1 will only be accepted if snapshot reading for K1 is enabled, because this will not add K1 in the read conflicting set, which will be used by resolvers to check the confliction during the commit phase.

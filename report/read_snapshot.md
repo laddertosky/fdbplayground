@@ -1,11 +1,31 @@
 ## Task setup
 Prerequisite: 4 pairs of key-value existed in the FDB cluster (K1, K2, K3, K4)
 
-Timeline:
-T1: Read K1, K2, K3
-T2: Update K2, K4
-T2 commit
-T1 commit
+```mermaid
+sequenceDiagram
+    actor T1 as Thread1
+    participant fdb as FDBCluster
+    actor T2 as Thread2
+
+    Note over fdb: K1, K2, K3, k4 (Version 100)
+    
+    T1->>fdb: Create Transaction<br>T1
+    T2->>fdb: Create Transaction<br>T2
+
+    T1->>fdb: Read K1, K2, K3
+    fdb->>T1: V1, V2, V3 (Version 100)
+
+    T2->>fdb: Update K2, K4
+    T2->>fdb: Commit Transaction<br>T2
+    fdb->>T2: Accepted (Version 101)
+    
+    Note over fdb: K1, K3 (Version 100)<br>K2, K4 (Version 101)
+
+    T1->>fdb: Commit Transaction<br>T1
+    fdb->>T1: Accepted
+    Note over fdb: FDB will never abort read only transaction.
+
+```
 
 ## Comment
 I think the scenario for this sub-task will not demonstrate the power of snapshot read.
