@@ -150,4 +150,4 @@ sudo cmake --install ./bindings/c/
 
 3. Sometime the `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)` will have `0` in `*out_count` even though `*out_more` is `true`.
 
-4. The streaming mode will affect the items count (*out_count) returned from each `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)` call. Iterator mode will gradually change the limit between each call.
+4. The streaming mode will affect the items count `*out_count` returned from each `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)` call. Iterator mode will gradually change the limit between each call.
