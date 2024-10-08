@@ -3,13 +3,13 @@ Prerequisite: 10k pairs of key-value existed in the FDB cluster
 
 Use getrange from `\x00` - `\xff` to fetch all keys in the userspace.
 Try the following streaming mode to compare the performance.
-    FDB_STREAMING_MODE_WANT_ALL
-    FDB_STREAMING_MODE_ITERATOR (default)
-    FDB_STREAMING_MODE_EXACT 
-    FDB_STREAMING_MODE_SMALL
-    FDB_STREAMING_MODE_MEDIUM
-    FDB_STREAMING_MODE_LARGE
-    FDB_STREAMING_MODE_SERIAL
+- `FDB_STREAMING_MODE_WANT_ALL`
+- `FDB_STREAMING_MODE_ITERATOR` (default)
+- `FDB_STREAMING_MODE_EXACT `
+- `FDB_STREAMING_MODE_SMALL`
+- `FDB_STREAMING_MODE_MEDIUM`
+- `FDB_STREAMING_MODE_LARGE`
+- `FDB_STREAMING_MODE_SERIAL`
 
 ## Comment
 

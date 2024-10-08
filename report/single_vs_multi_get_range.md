@@ -3,13 +3,13 @@ Prerequisite: 10k pairs of key-value existed in the FDB cluster
 
 Use getrange to fetch 1k keys each and send multiple(10) transactions to get all pairs.
 Try the following streaming mode to compare the performance.
-    `FDB_STREAMING_MODE_WANT_ALL`
-    `FDB_STREAMING_MODE_ITERATOR` (default)
-    `FDB_STREAMING_MODE_EXACT `
-    `FDB_STREAMING_MODE_SMALL`
-    `FDB_STREAMING_MODE_MEDIUM`
-    `FDB_STREAMING_MODE_LARGE`
-    `FDB_STREAMING_MODE_SERIAL`
+- `FDB_STREAMING_MODE_WANT_ALL`
+- `FDB_STREAMING_MODE_ITERATOR` (default)
+- `FDB_STREAMING_MODE_EXACT `
+- `FDB_STREAMING_MODE_SMALL`
+- `FDB_STREAMING_MODE_MEDIUM`
+- `FDB_STREAMING_MODE_LARGE`
+- `FDB_STREAMING_MODE_SERIAL`
 
 ## Comment
 I use two ways to issues those 10 transactions, one in synchronous and another in asynchronous.
@@ -26,7 +26,6 @@ I use two ways to issues those 10 transactions, one in synchronous and another i
 
 
 Most of the case, asynchoronus calls for multiple transactions does not provide better performance.
-
  
 ## Execution Log
 ```
