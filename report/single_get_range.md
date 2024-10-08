@@ -27,7 +27,7 @@ Try the following streaming mode to compare the performance.
 The default iterator methods provide the almost the fastest performance, slightly worse than the exact method.
 But in the exact mode, the limit of item should be explicitly provided by user, which is not always possible.
 
-The streaming mode will affect the items count (*out_count) returned from each `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)`. Iterator mode will gradually change the limit between each call.
+The streaming mode will affect the items count (*out_count) returned from each `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)` call. Iterator mode will gradually change the limit between each call.
 
 ## Execution Log
 ```

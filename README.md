@@ -148,3 +148,6 @@ sudo cmake --install ./bindings/c/
 
 2. It's not uncommon to forget `fdb_future_block_until_ready(FDBFuture*)` normally will not return error code, even so, it does not return the error about the corresponding future. Use `fdb_future_get_error(FDBFuture*)` to obtain the required error code, especially for the future from `fdb_transaction_commit(FDBTransaction* tr)`.
 
+3. Sometime the `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)` will have `0` in `*out_count` even though `*out_more` is `true`.
+
+4. The streaming mode will affect the items count (*out_count) returned from each `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)` call. Iterator mode will gradually change the limit between each call.
