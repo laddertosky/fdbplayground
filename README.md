@@ -135,13 +135,14 @@ fdb> status
 
 ```
 ## Development setup
-1. Because I build this repository from source code, I need to install those headers (.h) and shared libraries (.so) before my development. The default path for installation is /usr/local
+1. Because I build foundationdb binaries from source code, I need to install those headers (.h) and shared libraries (.so) before my development. The default path for installation is /usr/local.
 
 ```
 cd <PATH_TO_FOUNDATIONDB_DIRECTORY>/build
 sudo cmake --install ./bindings/c/
 
 ```
+2. I use clangd as my LSP in neovim. However, clangd does not under Flow, which makes tracing code difficult. Does Apple provide any implementation about that? (Note: There is another JavaScript static type check name [flow](https://flow.org/), which is a different project.
 
 ## Development note
 1. In getrange, if we want to obtain the whole user key ranges [\x00, \xff), even though using \xff with 0 end_or_equal, fdb will throw "Key outside legal range. Currently I use \xfe as end key, because I don't use key starting with \xfe.
