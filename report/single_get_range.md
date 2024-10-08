@@ -13,20 +13,22 @@ Try the following streaming mode to compare the performance.
 
 ## Comment
 
-| Mode                        | Response Time   |
-|:----------------------------|----------------:|
-| FDB_STREAMING_MODE_WANT_ALL |   20.854980 ms  |
-| FDB_STREAMING_MODE_ITERATOR |   12.334961 ms  |
-| FDB_STREAMING_MODE_EXACT    |   11.858887 ms  |
-| FDB_STREAMING_MODE_SMALL    |  815.907959 ms  |
-| FDB_STREAMING_MODE_MEDIUM   |  225.569824 ms  |
-| FDB_STREAMING_MODE_LARGE    |   73.516113 ms  |
-| FDB_STREAMING_MODE_SERIAL   |   15.108887 ms  |
+| Mode                        | Response Time   | Count per call |
+|:----------------------------|----------------:| --------------:|
+| FDB_STREAMING_MODE_WANT_ALL |   20.854980 ms  |            448 |
+| FDB_STREAMING_MODE_ITERATOR |   12.334961 ms  |         Varies |
+| FDB_STREAMING_MODE_EXACT    |   11.858887 ms  |           1000 |
+| FDB_STREAMING_MODE_SMALL    |  815.907959 ms  |              2 |
+| FDB_STREAMING_MODE_MEDIUM   |  225.569824 ms  |              7 |
+| FDB_STREAMING_MODE_LARGE    |   73.516113 ms  |             25 |
+| FDB_STREAMING_MODE_SERIAL   |   15.108887 ms  |            448 |
 
 
 The default iterator methods provide the almost the fastest performance, slightly worse than the exact method.
 But in the exact mode, the limit of item should be explicitly provided by user, which is not always possible.
- 
+
+The streaming mode will affect the items count (*out_count) returned from each `fdb_future_get_keyvalue_array(FDBFuture* f, FDBKeyValue const** out_kv, int* out_count, fdb_bool_t* out_more)`. Iterator mode will gradually change the limit between each call.
+
 ## Execution Log
 ```
 Use cluster file: ../foundationdb/build/fdb.cluster

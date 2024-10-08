@@ -11,7 +11,7 @@ Try the following streaming mode to compare the performance.
     `FDB_STREAMING_MODE_LARGE`
     `FDB_STREAMING_MODE_SERIAL`
 
-## Reply
+## Comment
 I use two ways to issues those 10 transactions, one in synchronous and another in asynchronous.
 
 | Mode                        | synchronous     | asynchronous      | single_range(for reference) |
@@ -25,7 +25,8 @@ I use two ways to issues those 10 transactions, one in synchronous and another i
 | FDB_STREAMING_MODE_SERIAL   |   20.133057 ms  |     20.599854 ms  |      15.108887 ms  |
 
 
-Most of the case, asynchoronus calls for multiple transactions does not provide better performance
+Most of the case, asynchoronus calls for multiple transactions does not provide better performance.
+
  
 ## Execution Log
 ```
