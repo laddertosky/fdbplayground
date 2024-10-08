@@ -22,7 +22,7 @@ void check_obtained_value(FDBFuture* future, void* expected_raw);
 void exit_when_err(fdb_error_t err, const char* method);
 void* run_network();
 FDBDatabase* setup(const char* cluster_file_path, pthread_t* network_thread);
-void teardown(pthread_t* network_thread);
+void teardown(pthread_t* network_thread, FDBDatabase* db);
 
 fdb_error_t set_default_transaction_option(FDBTransaction* tr);
 

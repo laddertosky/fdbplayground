@@ -1,4 +1,5 @@
 #include "common.h"
+#include <foundationdb/fdb_c_types.h>
 #include <sys/time.h>
 #include <time.h>
 
@@ -81,7 +82,9 @@ FDBDatabase* setup(const char* cluster_file_path, pthread_t* network_thread) {
     return db;
 }
 
-void teardown(pthread_t* network_thread) {
+void teardown(pthread_t* network_thread, FDBDatabase* db) {
+    fdb_database_destroy(db);
+
     exit_when_err(fdb_stop_network(), "fdb_stop_network");
 
     int err_pthread = pthread_join(*network_thread, NULL);

@@ -205,5 +205,5 @@ int main(int argc, char** argv) {
     test_delete_range(db);
 
     destroy_key_value(keys, values, KEY_COUNT);
-    teardown(&network_thread);
+    teardown(&network_thread, db);
 }

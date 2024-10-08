@@ -220,6 +220,6 @@ int main(int argc, char** argv) {
 
     run_transaction(db, delete_range_impl, "cleanup");
     destroy_key_value(keys, values, KEY_COUNT);
-    teardown(&network_thread);
+    teardown(&network_thread, db);
 }
 

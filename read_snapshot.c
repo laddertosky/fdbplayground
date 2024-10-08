@@ -224,5 +224,5 @@ int main(int argc, char** argv) {
     run_transaction(db, get_range_impl, "read_all_for_checking_committed");
     run_transaction(db, delete_range_impl, "cleanup");
     destroy_key_value(keys, values, KEY_COUNT);
-    teardown(&network_thread);
+    teardown(&network_thread, db);
 }
